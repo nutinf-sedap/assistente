@@ -3,39 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente - Conversas Independentes</title>
+  <title>Assistente Virtual - NutInf SEDAP</title>
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Converse com nosso bot no canto da tela. Cada dispositivo terá um histórico independente.</p>
+  <p>Bem-vindo! Converse com nosso assistente no chat que aparecerá no canto da tela.</p>
 
-  <!-- CDN do Chat SDK conforme Publish > Chat SDK -->
+  <!-- CDN do Chat SDK -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
   <script>
-    // Gera/persiste um ID único por dispositivo para isolar conversas
+    // Função para criar e persistir um ID único por dispositivo
     function getUniqueUserId() {
-      let id = localStorage.getItem('cozeVisitorId');
-      if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem('cozeVisitorId', id);
+      let userId = localStorage.getItem('cozeVisitorId');
+      if (!userId) {
+        userId = crypto.randomUUID();
+        localStorage.setItem('cozeVisitorId', userId);
       }
-      return id;
+      return userId;
     }
 
-    // Inicializa o widget com seu bot e PAT
+    // Inicializa o Chat SDK com suas configurações
     new CozeWebSDK.WebChatClient({
       config: {
         bot_id: '7570014364363751432',
       },
       componentProps: {
-        title: 'Coze',
+        title: 'Assistente Virtual',
       },
       auth: {
         type: 'token',
         token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
+        onRefreshToken: function () {
+          return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
+        }
       },
-      // Chave: definir userInfo.id único por navegador/dispositivo
+      // Este é o objeto crítico para conversas independentes
       userInfo: {
         id: getUniqueUserId(),
         name: 'Visitante'
