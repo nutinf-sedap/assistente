@@ -10,41 +10,39 @@
   <p>Converse com nosso bot no canto da tela. As conversas são independentes por dispositivo.</p>
 
   <!-- CDN do Chat SDK, conforme sua tela de Publish -->
-  <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
-
-  <script>
-    // Função que cria um ID único para cada visitante e o salva no navegador.
-    // Isso garante que cada dispositivo tenha uma conversa separada.
-    function getUniqueUserId() {
-      let id = localStorage.getItem('cozeVisitorId');
-      if (!id) {
-        id = crypto.randomUUID(); // Gera um ID único e seguro
-        localStorage.setItem('cozeVisitorId', id);
-      }
-      return id;
+<script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+<script>
+  function getUniqueUserId() {
+    let id = localStorage.getItem('cozeVisitorId');
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem('cozeVisitorId', id);
     }
+    return id;
+  }
 
-    // Inicializa o widget do Coze com todas as suas informações
-    new CozeWebSDK.WebChatClient({
-      config: {
-        // ID do seu novo bot
-        bot_id: '7570014364363751432',
-      },
-      componentProps: {
-        // Título que aparecerá na janela do chat
-        title: 'Assistente SEDAP',
-      },
-      // Autenticação usando o seu Personal Access Token (PAT)
-      auth: {
-        type: 'token',
-        token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
-      },
-      // Objeto que identifica o usuário e garante conversas independentes
-      userInfo: {
-        id: getUniqueUserId(), // A função acima cuida da separação por dispositivo
-        name: 'Visitante',    // Nome padrão para quem usa o chat
+  new CozeWebSDK.WebChatClient({
+    config: {
+      bot_id: '7570014364363751432',
+    },
+    componentProps: {
+      title: 'Assistente SEDAP',
+    },
+    auth: {
+      type: 'token',
+      token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
+      onRefreshToken: function (oldToken) {
+        // Algumas versões do SDK exigem a callback; aqui retornamos o mesmo PAT.
+        return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
       }
-    });
-  </script>
+    },
+    userInfo: {
+      id: getUniqueUserId(),
+      name: 'Visitante'
+    }
+  });
+</script>
+
 </body>
 </html>
+
