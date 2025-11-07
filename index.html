@@ -1,178 +1,157 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistente Virtual - Coze Chatbot</title>
-    <style>
-        #chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .login-btn { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
-        .login-btn:disabled { background: #ccc; cursor: not-allowed; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Assistente - Coze Chat SDK (PKCE)</title>
 </head>
 <body>
-    <h1>Bem-vindo ao Assistente!</h1>
-    <p>Faça login para conversar com o bot.</p>
-    <button id="login-btn" class="login-btn">Autorizar com Coze</button>
+  <h1>Assistente</h1>
+  <p>Autorize para iniciar o chat.</p>
+  <button id="login-btn">Autorizar com Coze</button>
 
-    <!-- Scripts do Coze Chat SDK (carregue após o body para evitar bloqueios) -->
-    <script src="https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-sg/1.4.0/i18n/index.js"></script>
-    <script src="https://sf16-muse-va.ibytedtos.com/obj/rc-web-sdk-sg/1.4.0/sdk/index.js"></script>
+  <!-- CDN do Chat SDK conforme Publish > Chat SDK -->
+  <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
-    <script>
-        // Configurações da sua OAuth App (substitua pelos valores reais)
-        const CONFIG = {
-            clientId: '26793605799339710144968936091227.app.coze',
-            redirectUri: 'https://nutinf-sedap.github.io/assistente/',  // Seu GitHub Pages
-            authUrl: 'https://www.coze.com/oauth/authorize',  // Base da Coze
-            tokenUrl: 'https://api.coze.com/oauth/token',      // Endpoint de token
-            scopes: 'chat createConversation retrieveConversation listConversation createMessage listMessage getMetadata',  // Mínimos baseados na revisão anterior
-            botId: '7569740873408806930',  // Do painel Coze
-            appId: '1102733945476',  // Do Publish > Web SDK
-        };
+  <script>
+    // Configurações do seu OAuth App e do bot publicado
+    const CONFIG = {
+      clientId: '26793605799339710144968936091227.app.coze',               // Seu Client ID (PKCE)
+      redirectUri: 'https://nutinf-sedap.github.io/assistente/',           // Seu redirect URI (SPA)
+      authUrl: 'https://www.coze.com/oauth/authorize',                      // Endpoint de autorização
+      tokenUrl: 'https://api.coze.com/oauth/token',                         // Endpoint de token
+      scopes: 'chat createConversation retrieveConversation listConversation createMessage listMessage getMetadata', // mínimos recomendados
+      botId: '7569740873408806930'                                          // Seu bot_id do Publish > Chat SDK
+    };
 
-        // Função para gerar PKCE (code_verifier e code_challenge)
-        function generatePKCE() {
-            const verifier = Array.from(crypto.getRandomValues(new Uint8Array(32)))
-                .map(b => String.fromCharCode(b % 95 + 33)).join('');  // String aleatória segura
-            const encoder = new TextEncoder();
-            const data = encoder.encode(verifier);
-            return crypto.subtle.digest('SHA-256', data).then(hash => {
-                const challenge = btoa(String.fromCharCode(...new Uint8Array(hash)))
-                    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-                return { codeVerifier: verifier, codeChallenge: challenge };
-            });
+    // Gera/persiste um ID único por dispositivo para isolar conversas
+    function getUniqueUserId() {
+      let id = localStorage.getItem('cozeUserId');
+      if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem('cozeUserId', id);
+      }
+      return id;
+    }
+
+    // Utilitários PKCE
+    async function generatePKCE() {
+      const arr = new Uint8Array(32);
+      crypto.getRandomValues(arr);
+      const verifier = btoa(String.fromCharCode(...arr)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+/g, '');
+      const data = new TextEncoder().encode(verifier);
+      const hash = await crypto.subtle.digest('SHA-256', data);
+      const challenge = btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+/g, '');
+      return { codeVerifier: verifier, codeChallenge: challenge };
+    }
+
+    async function initiateOAuth() {
+      const { codeVerifier, codeChallenge } = await generatePKCE();
+      const state = crypto.randomUUID();
+      localStorage.setItem('oauthState', state);
+      localStorage.setItem('codeVerifier', codeVerifier);
+
+      const params = new URLSearchParams({
+        client_id: CONFIG.clientId,
+        redirect_uri: CONFIG.redirectUri,
+        scope: CONFIG.scopes,
+        response_type: 'code',
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256',
+        state
+      });
+
+      window.location.href = `${CONFIG.authUrl}?${params.toString()}`;
+    }
+
+    async function handleCallbackIfAny() {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('code');
+      const state = url.searchParams.get('state');
+      const error = url.searchParams.get('error');
+
+      if (error) {
+        console.error('Erro OAuth:', error);
+        return;
+      }
+      if (!code) return;
+
+      if (state !== localStorage.getItem('oauthState')) {
+        console.error('State inválido.');
+        return;
+      }
+
+      const codeVerifier = localStorage.getItem('codeVerifier');
+      const body = new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: CONFIG.clientId,
+        code,
+        redirect_uri: CONFIG.redirectUri,
+        code_verifier: codeVerifier
+      });
+
+      const resp = await fetch(CONFIG.tokenUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      const tokenData = await resp.json();
+      if (!tokenData.access_token) {
+        console.error('Falha ao obter token:', tokenData);
+        return;
+      }
+
+      localStorage.setItem('cozeAccessToken', tokenData.access_token);
+      localStorage.setItem('tokenExpires', Date.now() + (tokenData.expires_in || 3600) * 1000);
+      localStorage.removeItem('oauthState');
+      localStorage.removeItem('codeVerifier');
+
+      // Limpa parâmetros da URL
+      window.history.replaceState({}, document.title, CONFIG.redirectUri);
+    }
+
+    function tokenExpired() {
+      const exp = Number(localStorage.getItem('tokenExpires') || 0);
+      return !exp || Date.now() > exp;
+    }
+
+    async function startChat() {
+      const token = localStorage.getItem('cozeAccessToken');
+      if (!token || tokenExpired()) {
+        // Se preferir, acione o fluxo de refresh_token aqui, caso a Coze emita refresh_token para PKCE
+        // Para simplicidade, reinicia o fluxo de autorização
+        document.getElementById('login-btn').style.display = 'inline-block';
+        return;
+      }
+
+      new CozeWebSDK.WebChatClient({
+        config: { bot_id: CONFIG.botId },
+        componentProps: { title: 'Coze' },
+        auth: {
+          type: 'token',
+          token: token,
+          onRefreshToken: async function () {
+            // Estratégia simples: reabrir o fluxo PKCE quando expirar
+            await initiateOAuth();
+            return localStorage.getItem('cozeAccessToken') || '';
+          }
+        },
+        userInfo: {
+          id: getUniqueUserId(),
+          name: 'Visitante'
         }
+      });
 
-        // Função para obter ou criar user.id único
-        function getUniqueUserId() {
-            let userId = localStorage.getItem('cozeUserId');
-            if (!userId) {
-                userId = crypto.randomUUID();
-                localStorage.setItem('cozeUserId', userId);
-            }
-            return userId;
-        }
+      document.getElementById('login-btn').style.display = 'none';
+    }
 
-        // Inicia o fluxo OAuth PKCE
-        async function initiateOAuth() {
-            const { codeVerifier, codeChallenge } = await generatePKCE();
-            const state = crypto.randomUUID();  // Nonce para CSRF
-            const params = new URLSearchParams({
-                client_id: CONFIG.clientId,
-                redirect_uri: CONFIG.redirectUri,
-                scope: CONFIG.scopes,
-                response_type: 'code',
-                code_challenge: codeChallenge,
-                code_challenge_method: 'S256',
-                state: state,
-            });
-            
-            // Armazena state e verifier temporariamente
-            localStorage.setItem('oauthState', state);
-            localStorage.setItem('codeVerifier', codeVerifier);
-            
-            // Redireciona para Coze
-            window.location.href = `${CONFIG.authUrl}?${params.toString()}`;
-        }
+    document.getElementById('login-btn').addEventListener('click', initiateOAuth);
 
-        // Processa callback (executa após redirecionamento da Coze)
-        async function handleCallback() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-            const state = urlParams.get('state');
-            const error = urlParams.get('error');
-            
-            if (error) {
-                console.error('Erro OAuth:', error);
-                document.getElementById('login-btn').textContent = 'Falha na autorização. Tente novamente.';
-                return;
-            }
-            
-            if (!code || state !== localStorage.getItem('oauthState')) {
-                console.error('Estado inválido ou código ausente.');
-                return;
-            }
-            
-            const verifier = localStorage.getItem('codeVerifier');
-            const tokenParams = new URLSearchParams({
-                grant_type: 'authorization_code',
-                client_id: CONFIG.clientId,
-                code: code,
-                redirect_uri: CONFIG.redirectUri,
-                code_verifier: verifier,
-            });
-            
-            try {
-                const response = await fetch(CONFIG.tokenUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: tokenParams,
-                });
-                const tokenData = await response.json();
-                
-                if (tokenData.access_token) {
-                    localStorage.setItem('cozeAccessToken', tokenData.access_token);
-                    localStorage.setItem('tokenExpires', Date.now() + (tokenData.expires_in * 1000));
-                    localStorage.removeItem('oauthState');
-                    localStorage.removeItem('codeVerifier');
-                    
-                    // Limpa URL
-                    window.history.replaceState({}, document.title, CONFIG.redirectUri);
-                    
-                    initializeChatbot(tokenData.access_token);
-                } else {
-                    console.error('Falha ao obter token:', tokenData);
-                }
-            } catch (err) {
-                console.error('Erro no exchange de token:', err);
-            }
-        }
-
-        // Inicializa o Chat SDK com token
-        function initializeChatbot(token) {
-            if (!token) token = localStorage.getItem('cozeAccessToken');
-            
-            // Verifica expiração
-            const expires = localStorage.getItem('tokenExpires');
-            if (expires && Date.now() > expires) {
-                console.log('Token expirado. Redirecionando para renovação.');
-                document.getElementById('login-btn').click();  // Reinicia fluxo
-                return;
-            }
-            
-            new CozeWebSDK.default({
-                appId: CONFIG.appId,
-                botId: CONFIG.botId,
-                auth: {
-                    token: token,
-                    onRefreshToken: async () => {  // Renovação automática via PKCE
-                        console.log('Renovando token...');
-                        await initiateOAuth();  // Ou use refresh_token se disponível
-                        return localStorage.getItem('cozeAccessToken');
-                    },
-                },
-                user: {
-                    id: getUniqueUserId(),
-                    name: 'Usuário',
-                },
-                setting: {
-                    logLevel: 'error',
-                },
-            });
-            
-            document.getElementById('login-btn').style.display = 'none';  // Esconde botão após login
-        }
-
-        // Event listeners
-        document.getElementById('login-btn').addEventListener('click', initiateOAuth);
-
-        // Verifica se é callback (executa no load)
-        if (window.location.search.includes('code=')) {
-            handleCallback();
-        } else if (localStorage.getItem('cozeAccessToken')) {
-            initializeChatbot();  // Já logado
-        }
-    </script>
+    // Fluxo de inicialização
+    (async function init() {
+      await handleCallbackIfAny();
+      await startChat();
+    })();
+  </script>
 </body>
 </html>
