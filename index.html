@@ -3,164 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente - Coze Chat SDK (PKCE)</title>
+  <title>Assistente - Conversas Independentes</title>
 </head>
 <body>
-  <h1>Assistente</h1>
-  <p>Clique para autorizar e iniciar o chat.</p>
-  <button id="login-btn">Autorizar com Coze</button>
+  <h1>Assistente Virtual</h1>
+  <p>Este chatbot está configurado para manter o histórico independente por dispositivo.</p>
 
   <!-- CDN do Chat SDK conforme Publish > Chat SDK -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
   <script>
-    // Configurações do seu OAuth App e do agente publicado
-    const CONFIG = {
-      clientId: '87145084910556223274838011939739.app.coze',              // Client ID (PKCE) [web:22]
-      redirectUri: 'https://nutinf-sedap.github.io/assistente/',          // Redirect URI (com barra final) [web:22]
-      authUrl: 'https://www.coze.com/oauth/authorize',                    // Endpoint de autorização [web:22]
-      tokenUrl: 'https://api.coze.com/oauth/token',                       // Endpoint de token [web:22]
-      scopes: 'chat createConversation retrieveConversation listConversation createMessage listMessage getMetadata', // mínimos recomendados [web:11]
-      botId: '7570014364363751432'                                        // bot_id do Publish > Chat SDK [web:52]
-    };
-
-    // Utilitário: ID único por dispositivo para conversas independentes
+    // Gera/persiste um ID único por dispositivo para isolar conversas entre visitantes
     function getUniqueUserId() {
-      let id = localStorage.getItem('cozeUserId');
+      let id = localStorage.getItem('cozeVisitorId');
       if (!id) {
         id = crypto.randomUUID();
-        localStorage.setItem('cozeUserId', id);
+        localStorage.setItem('cozeVisitorId', id);
       }
       return id;
     }
 
-    // PKCE helpers
-    async function generatePKCE() {
-      const arr = new Uint8Array(32);
-      crypto.getRandomValues(arr);
-      const verifier = btoa(String.fromCharCode(...arr))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+/g, '');
-      const data = new TextEncoder().encode(verifier);
-      const hash = await crypto.subtle.digest('SHA-256', data);
-      const challenge = btoa(String.fromCharCode(...new Uint8Array(hash)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+/g, '');
-      return { codeVerifier: verifier, codeChallenge: challenge };
-    }
-
-    async function initiateOAuth() {
-      const { codeVerifier, codeChallenge } = await generatePKCE();
-      const state = crypto.randomUUID();
-      localStorage.setItem('oauthState', state);
-      localStorage.setItem('codeVerifier', codeVerifier);
-
-      const params = new URLSearchParams({
-        client_id: CONFIG.clientId,
-        redirect_uri: CONFIG.redirectUri,
-        scope: CONFIG.scopes,
-        response_type: 'code',
-        code_challenge: codeChallenge,
-        code_challenge_method: 'S256',
-        state
-      });
-
-      window.location.href = `${CONFIG.authUrl}?${params.toString()}`; // Redireciona para login/consentimento [web:22]
-    }
-
-    async function handleCallbackIfAny() {
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get('code');
-      const state = url.searchParams.get('state');
-      const error = url.searchParams.get('error');
-
-      if (error) {
-        console.error('Erro OAuth:', error);
-        return;
-      }
-      if (!code) return;
-
-      // Valida state contra o salvo antes do redirect
-      if (state !== localStorage.getItem('oauthState')) {
-        console.error('State inválido.');
-        return;
-      }
-
-      const codeVerifier = localStorage.getItem('codeVerifier');
-      const body = new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: CONFIG.clientId,
-        code,
-        redirect_uri: CONFIG.redirectUri,
-        code_verifier: codeVerifier
-      });
-
-      // Troca code -> access_token [web:22]
-      const resp = await fetch(CONFIG.tokenUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body
-      });
-      const tokenData = await resp.json();
-
-      if (!tokenData.access_token) {
-        console.error('Falha ao obter token:', tokenData);
-        return;
-      }
-
-      // Salva token e expiração no localStorage (para ver no DevTools) [web:149]
-      localStorage.setItem('cozeAccessToken', tokenData.access_token);
-      localStorage.setItem('tokenExpires', Date.now() + (tokenData.expires_in || 3600) * 1000);
-
-      // Limpa dados temporários e parâmetros da URL
-      localStorage.removeItem('oauthState');
-      localStorage.removeItem('codeVerifier');
-      history.replaceState({}, document.title, CONFIG.redirectUri);
-    }
-
-    function tokenExpired() {
-      const exp = Number(localStorage.getItem('tokenExpires') || 0);
-      return !exp || Date.now() > exp;
-    }
-
-    function initChatWithToken(token) {
-      // Inicializa o Chat SDK com token e userInfo.id estável [web:11][web:32]
-      new CozeWebSDK.WebChatClient({
-        config: { bot_id: CONFIG.botId },
-        componentProps: { title: 'Coze' },
-        auth: {
-          type: 'token',
-          token: token,
-          onRefreshToken: async function () {
-            // Estratégia simples: reabrir o fluxo PKCE para renovar
-            await initiateOAuth();
-            return localStorage.getItem('cozeAccessToken') || '';
-          }
-        },
-        userInfo: {
-          id: getUniqueUserId(),
-          name: 'Visitante'
+    // Inicializa o widget com bot_id publicado em Chat SDK e seu PAT atual
+    new CozeWebSDK.WebChatClient({
+      config: {
+        bot_id: '7570014364363751432', // seu novo bot_id do Publish > Chat SDK
+      },
+      componentProps: {
+        title: 'Coze',
+      },
+      auth: {
+        type: 'token',
+        token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
+        // Para produção, prefira OAuth/PKCE em vez de expor PAT no front-end.
+        // onRefreshToken pode retornar um novo token quando necessário.
+        onRefreshToken: function () {
+          return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
         }
-      });
-    }
-
-    async function startChat() {
-      const token = localStorage.getItem('cozeAccessToken');
-      if (!token || tokenExpired()) {
-        document.getElementById('login-btn').style.display = 'inline-block';
-        return;
+      },
+      // Identidade explícita do visitante garante conversas independentes por dispositivo
+      userInfo: {
+        id: getUniqueUserId(),
+        name: 'Visitante'
       }
-      initChatWithToken(token);
-      document.getElementById('login-btn').style.display = 'none';
-    }
-
-    document.getElementById('login-btn').addEventListener('click', initiateOAuth);
-
-    // Fluxo de inicialização da SPA
-    (async function init() {
-      await handleCallbackIfAny();  // salva cozeAccessToken/tokenExpires se houver code [web:22]
-      await startChat();            // só inicia Chat SDK com token válido [web:11]
-    })();
+    });
   </script>
 </body>
 </html>
-
-
