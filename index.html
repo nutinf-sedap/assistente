@@ -3,45 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente Virtual</title>
+  <title>Assistente - Conversas Independentes</title>
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Converse com nosso bot no canto da tela. Sua conversa é privada e independente de outros dispositivos!</p>
+  <p>Converse com nosso bot no canto da tela. Cada dispositivo terá um histórico independente.</p>
 
-  <!-- CDN do Chat SDK fornecido pelo Coze -->
+  <!-- CDN do Chat SDK conforme Publish > Chat SDK -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
   <script>
-    // Função para criar um ID único para cada visitante (dispositivo/navegador)
+    // Gera/persiste um ID único por dispositivo para isolar conversas
     function getUniqueUserId() {
       let id = localStorage.getItem('cozeVisitorId');
       if (!id) {
-        id = crypto.randomUUID(); // Gera um ID único e seguro
+        id = crypto.randomUUID();
         localStorage.setItem('cozeVisitorId', id);
       }
       return id;
     }
 
-    // Inicializa o widget com o PAT fornecido e configuração para conversas independentes
+    // Inicializa o widget com seu bot e PAT
     new CozeWebSDK.WebChatClient({
       config: {
-        bot_id: '7570014364363751432', // Seu novo bot_id
+        bot_id: '7570014364363751432',
       },
       componentProps: {
         title: 'Coze',
       },
       auth: {
         type: 'token',
-        token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M', // Seu PAT
-        onRefreshToken: function () {
-          return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M'; // Retorna o mesmo PAT (não expira automaticamente)
-        }
+        token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
       },
-      // Configuração para identificar o usuário e garantir conversas independentes
+      // Chave: definir userInfo.id único por navegador/dispositivo
       userInfo: {
-        id: getUniqueUserId(), // ID único por dispositivo
-        name: 'Visitante', // Nome padrão
+        id: getUniqueUserId(),
+        name: 'Visitante'
       }
     });
   </script>
