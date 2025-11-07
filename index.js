@@ -1,16 +1,11 @@
-// Função para gerar ID único por dispositivo (armazenado localmente)
-function generateUniqueUserId() {
-    let userId = localStorage.getItem('coze_user_id');
-    
-    if (!userId) {
-        // ID único: timestamp + random + navegador fingerprint simples
-        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + 
-                 '_' + navigator.userAgent.slice(0, 10).replace(/\s/g, '');
-        localStorage.setItem('coze_user_id', userId);
-        console.log('🆕 Novo usuário criado:', userId);
+// Função de debug para atualizar status na página
+function updateDebugStatus(message, color = '#333') {
+    const statusDiv = document.getElementById('debug-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `Status: ${message}`;
+        statusDiv.style.color = color;
+        console.log(`🔍 Debug: ${message}`);
     }
-    
-    return userId;
 }
 
 // Função para mostrar/ocultar loading
@@ -26,88 +21,151 @@ function toggleLoading(show) {
     loading.classList.toggle('hidden', !show);
 }
 
-// Inicializa quando a página carrega
+// Gera ID único por dispositivo
+function generateUniqueUserId() {
+    let userId = localStorage.getItem('coze_user_id');
+    if (!userId) {
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('coze_user_id', userId);
+        console.log('🆕 Novo usuário:', userId);
+    }
+    return userId;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Gera ID único para este usuário/dispositivo
-    const uniqueUserId = generateUniqueUserId();
-    
-    // Mostra loading
+    updateDebugStatus('Iniciando carregamento do SDK...', '#007bff');
     toggleLoading(true);
     
-    // Carrega o SDK do Coze dinamicamente (mais confiável)
-    const script = document.createElement('script');
-    script.src = 'https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js';
-    script.onload = () => {
+    const uniqueUserId = generateUniqueUserId();
+    updateDebugStatus('ID de usuário gerado: ' + uniqueUserId.substring(0, 20) + '...', '#007bff');
+    
+    // CONFIGS - SUBSTITUA AQUI!
+    const BOT_ID = '7569740873408806930'; // ← SEU BOT_ID REAL
+    const TOKEN = 'pat_hcAUqeVd3kk8t8CuutNzfQKZu5b2duD1YogVbLCBScRSULNiIBTXpk8ozvntOQDk'; // ← SEU PAT REAL
+    
+    // Validação básica
+    if (BOT_ID === '7569740873408806930' || TOKEN === 'pat_SEU_TOKEN_REAL_AQUI') {
+        updateDebugStatus('❌ ERRO: Substitua BOT_ID e TOKEN no index.js!', '#ff0000');
+        toggleLoading(false);
+        alert('⚠️ CONFIGURAÇÃO INVÁLIDA!\n\nAbra index.js e substitua:\n- BOT_ID pelo ID real do seu bot\n- TOKEN pelo seu Personal Access Token real\n\nTutorial: My Profile > Access Tokens');
+        return;
+    }
+    
+    // Carrega o SDK com timeout e retry
+    function loadCozeSDK(attempt = 1) {
+        updateDebugStatus(`Carregando SDK (tentativa ${attempt})...`, '#ff9900');
+        
+        const script = document.createElement('script');
+        script.src = 'https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js';
+        script.async = true;
+        script.onload = () => {
+            updateDebugStatus('✅ SDK carregado com sucesso!', '#28a745');
+            initializeChat();
+        };
+        script.onerror = () => {
+            updateDebugStatus('❌ Falha ao carregar SDK. Tentando URL alternativa...', '#ff0000');
+            // Tenta versão mais recente se falhar
+            if (attempt === 1) {
+                script.src = 'https://unpkg.com/@coze/chat-sdk@latest/dist/index.umd.js';
+                document.head.appendChild(script);
+                loadCozeSDK(2);
+            } else {
+                updateDebugStatus('❌ SDK não pôde ser carregado. Verifique conexão.', '#ff0000');
+                toggleLoading(false);
+                alert('Falha no carregamento do SDK. Verifique sua internet ou tente em 5 minutos.');
+            }
+        };
+        
+        if (attempt === 1) {
+            document.head.appendChild(script);
+        }
+    }
+    
+    // Inicializa o chat após SDK carregar
+    function initializeChat() {
+        updateDebugStatus('Inicializando chatbot...', '#007bff');
+        
         try {
-            // Inicializa o Chat SDK com configurações simples
-            new CozeWebSDK.WebChatClient({
-                // Config básica do bot (balão flutuante padrão)
+            // Verifica se o SDK está disponível
+            if (typeof CozeWebSDK === 'undefined') {
+                throw new Error('CozeWebSDK não encontrado. SDK pode não ter carregado completamente.');
+            }
+            
+            const chatClient = new CozeWebSDK.WebChatClient({
                 config: {
                     type: 'bot',
-                    bot_id: '7569740873408806930' // SUBSTITUA pelo seu bot_id real
+                    bot_id: BOT_ID,
+                    debug: true // Ativa logs internos do SDK
                 },
                 
-                // Autenticação (use seu PAT real)
                 auth: {
                     type: 'token',
-                    token: 'pat_SEU_TOKEN_REAL_AQUI', // SUBSTITUA pelo seu PAT
-                    onRefreshToken: () => 'pat_SEU_TOKEN_REAL_AQUI' // Mesmo token ou novo
+                    token: TOKEN,
+                    onRefreshToken: () => TOKEN
                 },
                 
-                // CRUCIAL: Identificação única por usuário/dispositivo
                 userInfo: {
-                    id: uniqueUserId, // Garante sessão isolada por dispositivo
-                    nickname: 'Visitante', // Nome genérico
-                    // Avatar opcional (pode remover se não quiser)
-                    // url: 'https://sf-coze-web-cdn.coze.com/obj/eden-sg/lm-lgvj/ljhwZthlaukjlkulzlp/coze/coze-logo.png'
+                    id: uniqueUserId,
+                    nickname: 'Visitante'
                 },
                 
-                // UI: Balão flutuante simples (padrão)
                 ui: {
                     base: {
-                        lang: 'pt-BR', // Ou 'en'
-                        zIndex: 9999 // Acima de tudo na página
+                        lang: 'pt-BR',
+                        zIndex: 999999
                     },
                     header: {
-                        isShow: true, // Mostra título no chat aberto
-                        isNeedClose: true // Botão para fechar o chat
+                        isShow: true,
+                        isNeedClose: true
                     },
+                    // CRUCIAL: Força o balão flutuante
                     asstBtn: {
-                        isNeed: true // MOSTRA o balão flutuante no canto (padrão)
+                        isNeed: true, // DEVE ser true para mostrar o balão
+                        position: 'right-bottom', // Canto inferior direito
+                        offset: { x: 20, y: 20 } // 20px da borda
                     },
                     chatBot: {
-                        title: 'Assistente IA', // Título do chat
-                        uploadable: true // Permite upload de arquivos
+                        title: 'Assistente IA',
+                        welcomeMsg: 'Olá! Como posso ajudar?', // Mensagem inicial
+                        uploadable: true
                     }
                 },
                 
-                // Callbacks para debug e loading
                 onInit: () => {
-                    console.log('✅ Chatbot carregado para usuário:', uniqueUserId);
-                    toggleLoading(false); // Esconde loading
+                    updateDebugStatus('🎉 Chatbot inicializado! Balão deve aparecer no canto.', '#28a745');
+                    toggleLoading(false);
+                    console.log('✅ Tudo funcionando! User ID:', uniqueUserId);
                 },
                 
                 onError: (error) => {
-                    console.error('❌ Erro no chatbot:', error);
+                    console.error('❌ Erro no SDK:', error);
+                    updateDebugStatus('❌ Erro: ' + (error.message || error), '#ff0000');
                     toggleLoading(false);
-                    alert('Erro ao carregar o chatbot. Verifique o console (F12).');
+                    alert('Erro no chatbot: ' + (error.message || 'Desconhecido'));
                 }
             });
             
-            console.log('🚀 SDK inicializado. Balão flutuante pronto!');
+            // Inicializa o widget (método padrão)
+            updateDebugStatus('Chamando inicialização do widget...', '#007bff');
+            chatClient.init(); // Ou apenas new() - testa ambos
             
         } catch (error) {
             console.error('🚨 Falha na inicialização:', error);
+            updateDebugStatus('🚨 Falha: ' + error.message, '#ff0000');
             toggleLoading(false);
-            alert('Falha crítica. Verifique se o bot_id e token estão corretos.');
+            alert('Falha crítica: ' + error.message);
         }
-    };
+    }
     
-    script.onerror = () => {
-        console.error('🚨 Falha ao carregar o SDK do Coze');
-        toggleLoading(false);
-        alert('Não foi possível carregar o chatbot. Verifique sua conexão.');
-    };
+    // Inicia o processo
+    loadCozeSDK();
     
-    document.head.appendChild(script);
+    // Timeout de segurança (5s)
+    setTimeout(() => {
+        if (document.querySelector('[class*="asstBtn"], [class*="floating"], .coze-widget')) {
+            updateDebugStatus('👀 Widget detectado na página!', '#28a745');
+        } else {
+            updateDebugStatus('⚠️ Widget não detectado. Verifique console para erros.', '#ff9900');
+        }
+    }, 5000);
 });
