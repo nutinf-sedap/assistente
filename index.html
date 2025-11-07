@@ -3,48 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente Virtual - PKCE</title>
+  <title>Assistente Virtual - SEDAP (PKCE)</title>
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Clique para iniciar o chat.</p>
+  <p>Autorize sua sessão e inicie o chat. Cada navegador/dispositivo terá conversa independente.</p>
   <button id="login-btn">Autorizar com Coze</button>
 
   <!-- Chat SDK -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
   <script>
-    // CONFIG: preencha após criar o OAuth App e já com seu bot publicado
+    // Configuração PKCE/Coze
     const CONFIG = {
-      clientId: '91667855569600637436985377941744.app.coze',          // OAuth App (PKCE) [web:22]
-      redirectUri: 'https://nutinf-sedap.github.io/assistente/', // Deve bater com o cadastrado [web:22]
-      authUrl: 'https://www.coze.com/oauth/authorize',       // Autorização [web:22]
-      tokenUrl: 'https://api.coze.com/oauth/token',          // Troca de token [web:22]
-      scopes: 'chat createConversation retrieveConversation listConversation createMessage listMessage getMetadata', // mínimos [web:11]
-      botId: '7570014364363751432'                           // do Publish > Chat SDK do seu agente [web:11]
+      clientId: '91667855569600637436985377941744.app.coze',
+      redirectUri: 'https://nutinf-sedap.github.io/assistente/',
+      authUrl: 'https://www.coze.com/oauth/authorize',
+      tokenUrl: 'https://api.coze.com/oauth/token',
+      scopes: 'chat createConversation retrieveConversation listConversation createMessage listMessage getMetadata',
+      botId: '7570014364363751432'
     };
 
-    // ID único por navegador para conversas independentes
-    function getUniqueUserId() {
+    // Utilidades
+    function b64url(buf) {
+      return btoa(String.fromCharCode(...new Uint8Array(buf)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+/g, '');
+    }
+    function getOrCreateUserId() {
       let id = localStorage.getItem('cozeUserId');
-      if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem('cozeUserId', id);
-      }
+      if (!id) { id = crypto.randomUUID(); localStorage.setItem('cozeUserId', id); }
       return id;
     }
 
-    // PKCE helpers
-    function b64url(buffer) {
-      return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+/g, '');
-    }
     async function generatePKCE() {
       const random = new Uint8Array(32);
       crypto.getRandomValues(random);
       const verifier = b64url(random);
-      const data = new TextEncoder().encode(verifier);
-      const digest = await crypto.subtle.digest('SHA-256', data);
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
       const challenge = b64url(digest);
       return { verifier, challenge };
     }
@@ -67,23 +62,23 @@
       window.location.href = `${CONFIG.authUrl}?${params.toString()}`;
     }
 
-    async function handleCallbackIfAny() {
+    async function exchangeCodeForTokenIfPresent() {
       const url = new URL(window.location.href);
       const code = url.searchParams.get('code');
       const state = url.searchParams.get('state');
-      const error = url.searchParams.get('error');
-      if (error) {
-        console.error('Erro OAuth:', error);
-        return;
-      }
       if (!code) return;
 
-      const saved = localStorage.getItem('coze_state');
-      if (state !== saved) {
+      const savedState = localStorage.getItem('coze_state');
+      if (state !== savedState) {
         console.error('State inválido');
         return;
       }
       const verifier = localStorage.getItem('coze_verifier');
+      if (!verifier) {
+        console.error('code_verifier ausente');
+        return;
+      }
+
       const body = new URLSearchParams({
         grant_type: 'authorization_code',
         client_id: CONFIG.clientId,
@@ -94,7 +89,7 @@
 
       const resp = await fetch(CONFIG.tokenUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body
       });
       const tokenData = await resp.json();
@@ -105,38 +100,33 @@
       localStorage.setItem('cozeAccessToken', tokenData.access_token);
       localStorage.setItem('tokenExpires', Date.now() + (tokenData.expires_in || 3600) * 1000);
 
-      // limpar temporários e limpar a URL
+      // limpar code/state da URL
+      history.replaceState({}, document.title, CONFIG.redirectUri);
+      // limpar temporários
       localStorage.removeItem('coze_state');
       localStorage.removeItem('coze_verifier');
-      history.replaceState({}, document.title, CONFIG.redirectUri);
     }
 
-    function tokenExpired() {
-      const exp = Number(localStorage.getItem('tokenExpires') || 0);
-      return !exp || Date.now() > exp;
-    }
-
-    function startChat() {
+    function startChatIfReady() {
       const token = localStorage.getItem('cozeAccessToken');
-      if (!token || tokenExpired()) {
+      if (!token) {
         document.getElementById('login-btn').style.display = 'inline-block';
         return;
       }
-      // Instancia com token e user.id
       new CozeWebSDK.WebChatClient({
         config: { bot_id: CONFIG.botId },
         componentProps: { title: 'Assistente SEDAP' },
         auth: {
           type: 'token',
           token: token,
-          onRefreshToken: async function () {
-            // Em SPAs sem refresh_token, reinicie o fluxo para renovar
-            await initiateOAuth();
+          onRefreshToken: async () => {
+            // Estratégia simples para renovar: peça autorização novamente
+            // await initiateOAuth();
             return localStorage.getItem('cozeAccessToken') || '';
           }
         },
         user: {
-          id: getUniqueUserId(),
+          id: getOrCreateUserId(),
           name: 'Visitante'
         }
       });
@@ -146,8 +136,8 @@
     document.getElementById('login-btn').addEventListener('click', initiateOAuth);
 
     (async function init() {
-      await handleCallbackIfAny();
-      startChat();
+      await exchangeCodeForTokenIfPresent();
+      startChatIfReady();
     })();
   </script>
 </body>
