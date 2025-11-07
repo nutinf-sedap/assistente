@@ -3,53 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente Virtual SEDAP - Resetável</title>
+  <title>Assistente SEDAP</title>
 </head>
 <body>
   <h1>Assistente Virtual SEDAP</h1>
-  <p>O chat zera o histórico automaticamente a cada 10 minutos.</p>
+  <p>limpa o contexto a cada 10 minutos automaticamente.</p>
 
-  <!-- Chat SDK Coze -->
+  <!-- Chat SDK Coze (Oversea) -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+
   <script>
-    // Configurações fixas
-    const PAT = 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
-    const bot_id = '7570014364363751432';
-    const user_id = (localStorage.getItem('cozeUserId') || (() => {
-      const uuid = crypto.randomUUID();
-      localStorage.setItem('cozeUserId', uuid);
-      return uuid;
-    })());
+    // ===== Configurações fixas =====
+    const PAT = 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M'; // coloque seu PAT válido aqui
+    const BOT_ID = '7570014364363751432'; // seu bot_id
+    const CLEAR_INTERVAL_MIN = 10; // minutos para reset automático
 
-    // Widget de chat padrão, retorna conversationId via callback interno
-    let conversationId = null;
+    // Gera/recupera um user_id estável por navegador
+    function getUserId() {
+      let uid = localStorage.getItem('cozeUserId');
+      if (!uid) {
+        uid = (crypto.randomUUID && crypto.randomUUID()) || (Math.random().toString(36).slice(2) + Date.now());
+        localStorage.setItem('cozeUserId', uid);
+      }
+      return uid;
+    }
 
+    let conversationId = localStorage.getItem('cozeCurrentConversationId') || null;
+
+    // ===== Inicializa o widget com PAT e onRefreshToken =====
     function startChat() {
       window._cozeWidget = new CozeWebSDK.WebChatClient({
-        config: { bot_id },
+        config: { bot_id: BOT_ID },
         componentProps: { title: 'Assistente SEDAP' },
-        auth: { type: 'token', token: PAT },
-        user: { id: user_id, name: 'Visitante' },
+        auth: {
+          type: 'token',
+          token: localStorage.getItem('COZE_PAT') || PAT,
+          onRefreshToken: async () => {
+            // Em cenários com PAT, apenas devolva o mesmo token;
+            // se um dia trocar o PAT via localStorage, o SDK pegará o novo.
+            return localStorage.getItem('COZE_PAT') || PAT;
+          }
+        },
+        user: {
+          id: getUserId(),
+          name: 'Visitante'
+        },
+        // Hook para capturar a conversa criada/ativa
         hooks: {
-          afterCreateConversation: function(data) { 
+          afterCreateConversation: function (data) {
             if (data && data.id) {
-              conversationId = data.id; 
-              localStorage.setItem('cozeCurrentConversationId', data.id);
+              conversationId = data.id;
+              localStorage.setItem('cozeCurrentConversationId', conversationId);
+              console.log('Conversation criada/ativa:', conversationId);
             }
           }
         }
       });
     }
-    startChat();
 
-    // Função para limpeza (reset) automática do contexto
-    async function clearContext(conversation_id) {
-      if (!conversation_id) return;
+    // ===== Chamada de limpeza de contexto (reset) por API =====
+    async function clearContext(convId) {
+      if (!convId) return;
       try {
-        const resp = await fetch(`https://api.coze.com/v1/conversations/${conversation_id}/clear`, {
+        const resp = await fetch(`https://api.coze.com/v1/conversations/${convId}/clear`, {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + PAT,
+            'Authorization': 'Bearer ' + (localStorage.getItem('COZE_PAT') || PAT),
             'Content-Type': 'application/json'
           },
           body: '{}'
@@ -61,13 +80,21 @@
       }
     }
 
-    // Reset automático a cada 10 minutos
+    // ===== Agendamento automático de reset =====
     setInterval(() => {
-      // Tenta obter o conversationId do widget ou do localStorage
       const id = conversationId || localStorage.getItem('cozeCurrentConversationId');
       if (id) clearContext(id);
-    }, 10 * 60 * 1000); // 10 minutos
+    }, CLEAR_INTERVAL_MIN * 60 * 1000);
 
+    // Opcional: expor uma função manual para reset via console
+    window.resetAgora = () => {
+      const id = conversationId || localStorage.getItem('cozeCurrentConversationId');
+      if (id) clearContext(id);
+      else console.warn('Sem conversationId ainda.');
+    };
+
+    // Inicia o chat
+    startChat();
   </script>
 </body>
 </html>
