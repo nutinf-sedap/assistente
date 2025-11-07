@@ -3,20 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Chatbot Coze</title>
-    <link rel="stylesheet" href="main.css">
+    <title>Teste Simples de Chatbot</title>
+    <style>
+        /* CSS Básico incorporado */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <div class="page-content">
-        <h1>🧪 Teste do Chatbot</h1>
-        <p>Se o balão aparecer no canto inferior direito, está funcionando!</p>
-        <p>Abra F12 > Console para ver logs de debug.</p>
-        <div id="debug-status" style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px;">
-            Status: Aguardando inicialização...
-        </div>
-    </div>
+    <h1>Página de Teste do Chatbot</h1>
+    <p style="text-align: center;">Se tudo estiver correto, um balão de chat deve aparecer no canto inferior direito.</p>
 
-    <!-- Nosso script com debug -->
-    <script src="index.js"></script>
+    <!-- Script do Coze SDK -->
+    <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+    
+    <!-- Script de Inicialização Incorporado -->
+    <script>
+        // Espera a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Página carregada, tentando iniciar o chatbot...');
+
+            // Função para gerar ID de usuário único
+            function generateUniqueUserId() {
+                let userId = localStorage.getItem('coze_test_user_id');
+                if (!userId) {
+                    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+                    localStorage.setItem('coze_test_user_id', userId);
+                    console.log('Novo ID de usuário gerado:', userId);
+                }
+                return userId;
+            }
+
+            try {
+                // Tenta inicializar o WebChatClient
+                new CozeWebSDK.WebChatClient({
+                    config: {
+                        bot_id: '7569740873408806930', // SUBSTITUA PELO SEU BOT_ID
+                    },
+                    auth: {
+                        type: 'token',
+                        token: 'pat_hcAUqeVd3kk8t8CuutNzfQKZu5b2duD1YogVbLCBScRSULNiIBTXpk8ozvntOQDk', // SUBSTITUA PELO SEU TOKEN
+                        onRefreshToken: () => 'pat_hcAUqeVd3kk8t8CuutNzfQKZu5b2duD1YogVbLCBScRSULNiIBTXpk8ozvntOQDk'
+                    },
+                    userInfo: {
+                        id: generateUniqueUserId() // Gera ID único para sessão isolada
+                    },
+                    ui: {
+                        chatBot: {
+                            title: 'Assistente de Teste'
+                        }
+                    },
+                    onInit: () => {
+                        console.log('✅ SUCESSO: Chatbot inicializado!');
+                    },
+                    onError: (error) => {
+                        console.error('❌ ERRO no Coze SDK:', error);
+                        alert('Erro ao carregar o chatbot: ' + error.message);
+                    }
+                });
+            } catch (error) {
+                console.error('🚨 FALHA CRÍTICA: Não foi possível instanciar o CozeWebSDK.', error);
+                alert('Falha crítica. Verifique se o script principal do Coze carregou corretamente.');
+            }
+        });
+    </script>
 </body>
 </html>
