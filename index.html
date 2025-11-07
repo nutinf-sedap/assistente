@@ -1,12 +1,71 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="./main.css" />
-  </head>
-  <body>  
-    <!-- Install SDK -->
-    <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.10/libs/oversea/index.js"></script>
-    <script src="./index.js"></script>
-  </body>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chatbot</title>
+    <style>
+        /* CSS opcional para personalizar a página */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Converse com meu assistente</h1>
+    <p>Clique no ícone no canto para abrir o chat.</p>
+
+    <!-- Script do Coze Chat SDK (não edite o src) -->
+    <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+    <script>
+        new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7569740873408806930',  // Seu bot ID (não mude se for o mesmo)
+                // Opções adicionais aqui, se precisar (ex: tema ou idioma)
+                // theme: 'dark',  // 'light' ou 'dark' (padrão: light)
+                // language: 'pt-BR',  // Idioma do chat (padrão: en)
+            },
+            componentProps: {
+                title: 'Meu Assistente IA',  // Edite: Título do header do chat
+                // Posição do chat (padrão: 'right' no canto direito)
+                position: 'right',  // 'left' ou 'right'
+                // Largura do chat (em px ou %)
+                width: '400px',  // Exemplo: ajuste o tamanho
+                // Altura máxima
+                maxHeight: '600px',
+                // Mostrar header? (padrão: true)
+                showHeader: true,
+                // Placeholder da input (texto no campo de mensagem)
+                inputPlaceholder: 'Digite sua pergunta aqui...',
+                // Avatar do bot (URL de imagem)
+                // botAvatar: 'https://exemplo.com/minha-imagem-bot.png',
+                // Avatar do usuário (se quiser customizar)
+                // userAvatar: 'https://exemplo.com/minha-imagem-user.png',
+                // Cor de fundo do chat
+                // backgroundColor: '#f0f0f0',
+                // Cor do header
+                // headerColor: '#007bff',
+            },
+            auth: {
+                type: 'token',  // Sempre 'token' para PAT
+                token: 'pat_hcAUqeVd3kk8t8CuutNzfQKZu5b2duD1YogVbLCBScRSULNiIBTXpk8ozvntOQDk',  // Edite: Cole seu PAT completo (ex: pat_abc123xyz...)
+                onRefreshToken: function (oldToken) {
+                    // Função para renovar token expirado (retorne um novo PAT)
+                    // Se não precisar renovar, retorne o mesmo token
+                    console.log('Token expirado, renovando...');  // Log para debug
+                    return 'pat_hcAUqeVd3kk8t8CuutNzfQKZu5b2duD1YogVbLCBScRSULNiIBTXpk8ozvntOQDk';  // Edite: Retorne seu PAT (ou chame uma API para novo)
+                }
+            },
+            // Callbacks opcionais (eventos)
+            onInit: function() {
+                console.log('Chat inicializado com sucesso!');  // Log quando carregar
+            },
+            onMessage: function(message) {
+                console.log('Nova mensagem:', message);  // Log de mensagens recebidas
+            },
+            onError: function(error) {
+                console.error('Erro no chat:', error);  // Log de erros
+            }
+        });
+    </script>
+</body>
 </html>
