@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente Virtual - Conversas Independentes</title>
+  <title>Assistente Virtual - SEDAP</title>
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Converse com nosso bot no canto da tela. Sua conversa agora é privada e independente!</p>
+  <p>Converse com nosso bot no canto da tela. Sua conversa é privada e independente!</p>
 
   <!-- Script do Coze Chat SDK -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
   <script>
-    // Função para criar um ID único para cada visitante e garantir conversas separadas
+    // Função para criar um ID único por dispositivo/navegador
     function getUniqueUserId() {
       let visitorId = localStorage.getItem('cozeChatVisitorId');
       if (!visitorId) {
-        visitorId = crypto.randomUUID(); // Gera um ID único
+        visitorId = crypto.randomUUID(); // Gera ID único e seguro
         localStorage.setItem('cozeChatVisitorId', visitorId);
       }
       return visitorId;
@@ -26,20 +26,24 @@
     // Inicializa o widget do Coze com seus dados
     new CozeWebSDK.WebChatClient({
       config: {
-        // ID do seu novo bot
+        // ID do seu bot publicado no Chat SDK
         bot_id: '7570014364363751432',
       },
       componentProps: {
-        title: 'Assistente',
+        title: 'Assistente SEDAP',
       },
-      // Autenticação usando o seu Personal Access Token (PAT)
+      // Autenticação usando o Personal Access Token (PAT)
       auth: {
         type: 'token',
         token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
+        onRefreshToken: function () {
+          // Retorna o mesmo token quando o SDK solicitar renovação
+          return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
+        }
       },
-      // Objeto que identifica o usuário para criar conversas independentes
+      // Identifica cada visitante para criar conversas independentes
       userInfo: {
-        id: getUniqueUserId(), // Garante um ID diferente por dispositivo
+        id: getUniqueUserId(), // ID único por dispositivo
         name: 'Visitante',
       }
     });
