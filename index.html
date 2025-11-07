@@ -7,42 +7,45 @@
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Converse com nosso bot no canto da tela</p>
+  <p>Sua conversa é privada e independente!</p>
 
+  <!-- Script do Coze Chat SDK -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+
   <script>
+    // Função para criar um ID único por dispositivo/navegador
     function getUniqueUserId() {
-      try {
-        let id = localStorage.getItem('cozeChatVisitorId');
-        if (!id) {
-          id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(16).slice(2));
-          localStorage.setItem('cozeChatVisitorId', id);
-        }
-        return id;
-      } catch (e) {
-        // Fallback se localStorage estiver bloqueado
-        return (Date.now() + '-' + Math.random().toString(16).slice(2));
+      let visitorId = localStorage.getItem('cozeChatVisitorId');
+      if (!visitorId) {
+        visitorId = crypto.randomUUID();
+        localStorage.setItem('cozeChatVisitorId', visitorId);
       }
+      return visitorId;
     }
 
+    // Inicializa o widget do Coze com seus dados
     new CozeWebSDK.WebChatClient({
       config: {
+        // ID do seu bot publicado no Chat SDK
         bot_id: '7570014364363751432',
       },
       componentProps: {
         title: 'Assistente SEDAP',
       },
+      // Autenticação usando o Personal Access Token (PAT)
       auth: {
         type: 'token',
         token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
         onRefreshToken: function () {
+          // Retorna o mesmo token quando o SDK solicitar renovação
           return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
         }
       },
-      // ATENÇÃO: usar "user" (não "userInfo") para isolar as sessões
+      // **CORREÇÃO APLICADA AQUI**
+      // Identifica cada visitante para criar conversas independentes
       user: {
-        id: getUniqueUserId(),
-        name: 'Visitante'
+        id: getUniqueUserId(), // ID único por dispositivo
+        name: 'Visitante',
       }
     });
   </script>
