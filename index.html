@@ -3,47 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente Virtual - SEDAP</title>
+  <title>Assistente Virtual</title>
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Converse com nosso bot no canto da tela.</p>
+  <p>Converse com nosso bot no canto da tela. Sua conversa é privada e independente de outros dispositivos!</p>
 
-  <!-- CDN do Chat SDK, conforme sua tela de Publish -->
-<script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
-<script>
-  function getUniqueUserId() {
-    let id = localStorage.getItem('cozeVisitorId');
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem('cozeVisitorId', id);
-    }
-    return id;
-  }
+  <!-- CDN do Chat SDK fornecido pelo Coze -->
+  <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
-  new CozeWebSDK.WebChatClient({
-    config: {
-      bot_id: '7570014364363751432',
-    },
-    componentProps: {
-      title: 'Assistente SEDAP',
-    },
-    auth: {
-      type: 'token',
-      token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
-      onRefreshToken: function (oldToken) {
-        // Algumas versões do SDK exigem a callback; aqui retornamos o mesmo PAT.
-        return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
+  <script>
+    // Função para criar um ID único para cada visitante (dispositivo/navegador)
+    function getUniqueUserId() {
+      let id = localStorage.getItem('cozeVisitorId');
+      if (!id) {
+        id = crypto.randomUUID(); // Gera um ID único e seguro
+        localStorage.setItem('cozeVisitorId', id);
       }
-    },
-    userInfo: {
-      id: getUniqueUserId(),
-      name: 'Visitante'
+      return id;
     }
-  });
-</script>
 
+    // Inicializa o widget com o PAT fornecido e configuração para conversas independentes
+    new CozeWebSDK.WebChatClient({
+      config: {
+        bot_id: '7570014364363751432', // Seu novo bot_id
+      },
+      componentProps: {
+        title: 'Coze',
+      },
+      auth: {
+        type: 'token',
+        token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M', // Seu PAT
+        onRefreshToken: function () {
+          return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M'; // Retorna o mesmo PAT (não expira automaticamente)
+        }
+      },
+      // Configuração para identificar o usuário e garantir conversas independentes
+      userInfo: {
+        id: getUniqueUserId(), // ID único por dispositivo
+        name: 'Visitante', // Nome padrão
+      }
+    });
+  </script>
 </body>
 </html>
-
-
