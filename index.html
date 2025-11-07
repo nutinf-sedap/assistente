@@ -3,47 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Assistente - Conversas Independentes</title>
+  <title>Assistente Virtual - SEDAP</title>
 </head>
 <body>
   <h1>Assistente Virtual</h1>
-  <p>Este chatbot está configurado para manter o histórico independente por dispositivo.</p>
+  <p>Converse com nosso bot no canto da tela. As conversas são independentes por dispositivo.</p>
 
-  <!-- CDN do Chat SDK conforme Publish > Chat SDK -->
+  <!-- CDN do Chat SDK, conforme sua tela de Publish -->
   <script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
 
   <script>
-    // Gera/persiste um ID único por dispositivo para isolar conversas entre visitantes
+    // Função que cria um ID único para cada visitante e o salva no navegador.
+    // Isso garante que cada dispositivo tenha uma conversa separada.
     function getUniqueUserId() {
       let id = localStorage.getItem('cozeVisitorId');
       if (!id) {
-        id = crypto.randomUUID();
+        id = crypto.randomUUID(); // Gera um ID único e seguro
         localStorage.setItem('cozeVisitorId', id);
       }
       return id;
     }
 
-    // Inicializa o widget com bot_id publicado em Chat SDK e seu PAT atual
+    // Inicializa o widget do Coze com todas as suas informações
     new CozeWebSDK.WebChatClient({
       config: {
-        bot_id: '7570014364363751432', // seu novo bot_id do Publish > Chat SDK
+        // ID do seu novo bot
+        bot_id: '7570014364363751432',
       },
       componentProps: {
-        title: 'Coze',
+        // Título que aparecerá na janela do chat
+        title: 'Assistente SEDAP',
       },
+      // Autenticação usando o seu Personal Access Token (PAT)
       auth: {
         type: 'token',
         token: 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M',
-        // Para produção, prefira OAuth/PKCE em vez de expor PAT no front-end.
-        // onRefreshToken pode retornar um novo token quando necessário.
-        onRefreshToken: function () {
-          return 'pat_nOMe2AdxZGxCYGUrqDJFt65jsuDN3PleNl7H1Pemqr823RkZ413uNqizVN0LQg3M';
-        }
       },
-      // Identidade explícita do visitante garante conversas independentes por dispositivo
+      // Objeto que identifica o usuário e garante conversas independentes
       userInfo: {
-        id: getUniqueUserId(),
-        name: 'Visitante'
+        id: getUniqueUserId(), // A função acima cuida da separação por dispositivo
+        name: 'Visitante',    // Nome padrão para quem usa o chat
       }
     });
   </script>
