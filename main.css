@@ -1,41 +1,41 @@
-/* Estilos básicos para a página */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f8f9fa;
-    color: #333;
+:root {
+  color-scheme: light dark;
 }
 
-.page-content {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background: #f7f9fc;
+  color: #1f2937;
+}
+
+.container {
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 0 16px;
 }
 
 h1 {
-    color: #007bff;
+  margin: 0 0 16px;
+  font-size: 1.8rem;
+  color: #0f172a;
 }
 
-/* O SDK do Coze gerencia os estilos do balão automaticamente, 
-   mas garantimos que a página não interfira */
-#coze-chat-container {
-    z-index: 9999 !important;
+p {
+  margin: 8px 0;
+  line-height: 1.6;
 }
 
-/* Loading opcional */
-.loading {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 20px;
-    border-radius: 8px;
-    z-index: 10000;
+.status {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  border: 1px solid #c7d2fe;
+  font-size: 0.95rem;
+  word-break: break-word;
 }
 
-.hidden {
-    display: none;
-}
+/* Nenhum estilo interfere no balão do Coze; o SDK gerencia a UI do widget. */
