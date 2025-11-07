@@ -1,0 +1,41 @@
+/* Estilos básicos para a página */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.page-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    color: #007bff;
+}
+
+/* O SDK do Coze gerencia os estilos do balão automaticamente, 
+   mas garantimos que a página não interfira */
+#coze-chat-container {
+    z-index: 9999 !important;
+}
+
+/* Loading opcional */
+.loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 10000;
+}
+
+.hidden {
+    display: none;
+}
