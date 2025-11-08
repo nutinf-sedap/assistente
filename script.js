@@ -1,5 +1,5 @@
 // ==================== CONFIGURAÇÃO ====================
-const GIST_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/'; // Substitua pelos seus valores
+const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/'; // Substitua pelos seus valores
 const RANDOM_NAMES_COUNT = 4;
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 10 * 60 * 1000; // 10 minutos em ms
@@ -11,10 +11,11 @@ let state = {
     selectedName: null,
     attemptCount: 0,
     isLocked: false,
-    lockEndTime: null
+    lockEndTime: null,
+    cpfExists: false // Flag para saber se o CPF existe na base
 };
 
-// Lista de nomes aleatórios (será importada dinamicamente ou hardcoded)
+// Lista de nomes aleatórios
 let randomNamesList = [];
 
 // ==================== INICIALIZAÇÃO ====================
@@ -27,8 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==================== CARREGAMENTO DE DADOS ====================
 async function loadRandomNamesList() {
     try {
-        // Você pode hospedar esta lista em um arquivo separado ou em um Gist
-        // Para simplicidade, usamos uma lista padrão aqui
         randomNamesList = getDefaultRandomNamesList();
     } catch (error) {
         console.error('Erro ao carregar lista de nomes:', error);
@@ -37,9 +36,7 @@ async function loadRandomNamesList() {
 }
 
 function getDefaultRandomNamesList() {
-    // Lista com centenas de nomes masculinos e femininos variados
     return [
-        // Masculinos
         'Roberto', 'Carlos', 'Francisco', 'Antonio', 'Marcos', 'Alexandre', 'Felipe', 'Diego',
         'Bruno', 'Ricardo', 'Rodrigo', 'Gustavo', 'Lucas', 'Daniel', 'Rafael', 'Fernando',
         'Sergio', 'Paulo', 'Luis', 'Fabio', 'Claudio', 'Marcelo', 'Mateus', 'Andre',
@@ -48,52 +45,41 @@ function getDefaultRandomNamesList() {
         'Inacio', 'Anselmo', 'Apolonio', 'Ariosto', 'Armando', 'Arnaldo', 'Artemio', 'Augusto',
         'Aurelio', 'Aureliano', 'Avelino', 'Ayrton', 'Baltasar', 'Baltazar', 'Belmiro', 'Beltrão',
         'Benedito', 'Benilson', 'Beno', 'Benoni', 'Benvenuto', 'Berilo', 'Brinaldo', 'Brás',
-        'Braulio', 'Breno', 'Brito', 'Buenaventura', 'Caetano', 'Caio', 'Cais', 'Caison',
-        'Cajetano', 'Calderão', 'Calderino', 'Calígula', 'Calimaco', 'Calisto', 'Califoro', 'Calorino',
-        'Calotipo', 'Calusto', 'Calvacante', 'Calvacanti', 'Calvacinto', 'Calvada', 'Cavalador', 'Cavalado',
-        'Cavalala', 'Cavalali', 'Cavalalo', 'Cavalamo', 'Cavalana', 'Cavalano', 'Cavalanto', 'Cavalapa',
-        'Cavalapol', 'Cavalapo', 'Cavalapoli', 'Cavalar', 'Cavalara', 'Cavalaran', 'Cavalarani', 'Cavalare',
-        'Cavalarei', 'Cavalareir', 'Cavalareta', 'Cavalaretão', 'Cavalareto', 'Cavalareza', 'Cavalarezado', 'Cavalarezi',
-        'Cavalarezim', 'Cavalarezinha', 'Cavalarfil', 'Cavalarfio', 'Cavalarfiol', 'Cavalarfira', 'Cavalarfol', 'Cavalarfo',
-        'Cavalarfol', 'Cavalarfoli', 'Cavalarfolo', 'Cavalarfora', 'Cavalarfori', 'Cavalarforio', 'Cavalari', 'Cavalaria',
-        'Cavalarin', 'Cavalarino', 'Cavalario', 'Cavalarita', 'Cavalariz', 'Cavalariza', 'Cavalarizo', 'Cavalarizu',
-        'Cavalarona', 'Cavalarono', 'Cavalaro', 'Cavalaroa', 'Cavalaroan', 'Cavalaron', 'Cavalarona', 'Cavalarone',
-        'Cavalaronha', 'Cavalaronia', 'Cavalaronio', 'Cavalars', 'Cavalarsa', 'Cavalarson', 'Cavalarso', 'Cavalarsu',
-        'Cavalarsu', 'Cavalarsu', 'Cavalarsu', 'Cavalarsu', 'Cavalarza', 'Cavalarzan', 'Cavalarzo', 'Cavalarzu',
-        'Cavalarzu', 'Cavalarzu', 'Cavalarzu', 'Cavalarzu',
         'Ana', 'Beatriz', 'Carla', 'Daniela', 'Elisa', 'Fernanda', 'Gabriela', 'Heloisa',
         'Iris', 'Joana', 'Katarina', 'Laura', 'Mariana', 'Natalia', 'Olivia', 'Patricia',
-        'Quinete', 'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Ximena',
-        'Yasmin', 'Zelia', 'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Aileen',
-        'Aileyana', 'Aileyne', 'Ailsa', 'Aima', 'Aimara', 'Aimarinha', 'Aina', 'Ainara',
-        'Ainarja', 'Ainayne', 'Aindreia', 'Aindria', 'Aineah', 'Aineide', 'Aineire', 'Ainelice',
-        'Ainelia', 'Ainelis', 'Aineliz', 'Ainelyda', 'Ainelzira', 'Ainema', 'Ainemara', 'Ainemilena',
-        'Ainemir', 'Ainemira', 'Ainena', 'Ainenara', 'Ainenilda', 'Ainenice', 'Ainenildo', 'Aimene',
-        'Aimenia', 'Aimenica', 'Aimenaida', 'Aimenaides', 'Aimenarda', 'Aimenblanda', 'Aimenberta', 'Aimenblanca',
-        'Aimencada', 'Aimencara', 'Aimencarina', 'Aimencasa', 'Aimencatarina', 'Aimencecilia', 'Aimencelia', 'Aimencendalia',
-        'Aimencenda', 'Aimencenilda', 'Aimencenicileia', 'Aimencenicilia', 'Aimencenice', 'Aimenceniceia', 'Aimencenicela', 'Aimencera',
-        'Aimenceres', 'Aimencerina', 'Aimencerita', 'Aimenceriza', 'Aimencesa', 'Aimencesinda', 'Aimencesita', 'Aimencesia',
-        'Aimencezia', 'Aimencezilda', 'Aimencezina', 'Aimencezinha', 'Aimencezita', 'Aimencezilda', 'Aimencezinda', 'Aimencezinha',
-        'Aimencezita', 'Aimencezora', 'Aimencezuda', 'Aimencezuida', 'Aimencezuina', 'Aimencezuinha', 'Aimencezuita', 'Aimencezuizilda',
-        'Aimencezuizina', 'Aimencezuizinha', 'Aimencezuizita', 'Aimencezuizora', 'Aimencezuizuda', 'Aimenclara', 'Aimenclere', 'Aimencleria',
-        'Aimensetina', 'Aimensilda', 'Aimensiliana', 'Aimensilina', 'Aimensilinda', 'Aimensilinha', 'Aimensilita', 'Aimensilizilda',
-        'Aimensilizina', 'Aimensilizinha', 'Aimensilizita', 'Aimensilizora', 'Aimensilizuda', 'Aimensilizuida', 'Aimensilizuina', 'Aimensilizuinha',
-        'Aimensilva', 'Aimensa', 'Aimensada', 'Aimensadela', 'Aimensadera', 'Aimensaderim', 'Aimensadezia', 'Aimensadeza',
-        'Aimensadezo', 'Aimensadi', 'Aimensadiana', 'Aimensadiano', 'Aimensadiao', 'Aimensadina', 'Aimensadino', 'Aimensadio',
-        'Aimensadoel', 'Aimensadoga', 'Aimensadote', 'Aimensador', 'Aimensadora', 'Aimensadoraia', 'Aimensadoraia', 'Aimensadorela'
+        'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Yasmin', 'Zelia',
+        'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Amanda', 'Angelica', 'Aparecida',
+        'Augusta', 'Barbara', 'Bianca', 'Bruna', 'Camila', 'Carolina', 'Cecilia', 'Celia',
+        'Clara', 'Claudia', 'Cristina', 'Debora', 'Denise', 'Diana', 'Eduarda', 'Elena',
+        'Elisabete', 'Emilia', 'Erica', 'Esther', 'Fabiana', 'Fatima', 'Flavia', 'Flora',
+        'Francisca', 'Gisele', 'Gloria', 'Graciela', 'Helena', 'Ines', 'Isabel', 'Ivone',
+        'Jacqueline', 'Janaina', 'Josefa', 'Julia', 'Juliana', 'Karina', 'Lara', 'Larissa',
+        'Leticia', 'Lia', 'Lidia', 'Lilian', 'Lorena', 'Lucia', 'Luciana', 'Luisa',
+        'Madalena', 'Manuela', 'Marcela', 'Marcia', 'Margareth', 'Marta', 'Melissa', 'Michele',
+        'Miriam', 'Monica', 'Nadia', 'Neusa', 'Nina', 'Norma', 'Odete', 'Olga',
+        'Pamela', 'Paula', 'Priscila', 'Raquel', 'Regina', 'Renata', 'Rita', 'Roberta',
+        'Rosa', 'Rosana', 'Rosangela', 'Sandra', 'Sara', 'Silvia', 'Sofia', 'Sonia',
+        'Stella', 'Sueli', 'Suzana', 'Tania', 'Teresa', 'Valeria', 'Vera', 'Veronica',
+        'Vitoria', 'Viviane', 'Yara', 'Yolanda'
     ];
 }
 
 // ==================== CONFIGURAÇÃO DE EVENTOS ====================
 function setupEventListeners() {
-    // Tela de CPF
     const cpfInput = document.getElementById('cpf-input');
     const btnSearch = document.getElementById('btn-search');
+    const cpfBackground = document.querySelector('.cpf-background');
     
     cpfInput.addEventListener('input', (e) => {
-        // Permitir apenas números
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
         document.getElementById('error-cpf').textContent = '';
+        
+        // Desaparecer o fundo quando começa a digitar
+        if (e.target.value.length > 0) {
+            cpfBackground.classList.add('hidden');
+        } else {
+            cpfBackground.classList.remove('hidden');
+        }
     });
     
     cpfInput.addEventListener('keypress', (e) => {
@@ -103,12 +89,8 @@ function setupEventListeners() {
     });
     
     btnSearch.addEventListener('click', searchCpf);
-    
-    // Tela de Seleção de Nome
     document.getElementById('btn-confirm-name').addEventListener('click', confirmName);
     document.getElementById('btn-back-to-cpf').addEventListener('click', backToCpf);
-    
-    // Tela de Erro
     document.getElementById('btn-retry').addEventListener('click', backToCpf);
 }
 
@@ -133,7 +115,6 @@ async function searchCpf() {
         return;
     }
     
-    // Verificar se está bloqueado
     if (state.isLocked) {
         const remainingTime = Math.ceil((state.lockEndTime - Date.now()) / 1000);
         errorElement.textContent = `Bloqueado. Tente novamente em ${remainingTime}s`;
@@ -147,19 +128,20 @@ async function searchCpf() {
         const data = await fetchGistData();
         const matches = data.filter(record => record.cpf_primeiros_4 === cpf);
         
-        if (matches.length === 0) {
-            errorElement.textContent = 'Nenhum registro encontrado com este prefixo';
-            btnSearch.disabled = false;
-            loadingElement.style.display = 'none';
-            return;
-        }
-        
         state.currentCpf = cpf;
-        state.matchedUsers = matches;
-        state.selectedName = null;
         state.attemptCount = 0;
         
-        showNameSelectionScreen();
+        if (matches.length === 0) {
+            // CPF não existe - mostrar nomes aleatórios
+            state.cpfExists = false;
+            state.matchedUsers = [];
+            showRandomNamesScreen();
+        } else {
+            // CPF existe - mostrar nomes reais + aleatórios
+            state.cpfExists = true;
+            state.matchedUsers = matches;
+            showNameSelectionScreen();
+        }
     } catch (error) {
         console.error('Erro ao buscar CPF:', error);
         errorElement.textContent = 'Erro ao conectar ao servidor. Tente novamente.';
@@ -185,19 +167,50 @@ async function fetchGistData() {
     }
 }
 
-// ==================== TELA DE SELEÇÃO DE NOME ====================
+// ==================== TELA DE SELEÇÃO DE NOME (CPF VÁLIDO) ====================
 function showNameSelectionScreen() {
     const realNames = state.matchedUsers.map(u => u.primeiro_nome);
     const alternatives = buildAlternativesList(realNames);
     
-    // Embaralhar
     shuffleArray(alternatives);
     
-    // Renderizar opções
     const container = document.getElementById('names-container');
     container.innerHTML = '';
     
-    alternatives.forEach((name, index) => {
+    alternatives.forEach((name) => {
+        const button = document.createElement('button');
+        button.className = 'name-option';
+        button.textContent = name;
+        button.setAttribute('data-name', name);
+        button.setAttribute('aria-label', `Opção: ${name}`);
+        
+        button.addEventListener('click', () => selectName(name, button));
+        
+        container.appendChild(button);
+    });
+    
+    document.getElementById('error-name').textContent = '';
+    showScreen('screen-name');
+}
+
+// ==================== TELA DE NOMES ALEATÓRIOS (CPF INVÁLIDO) ====================
+function showRandomNamesScreen() {
+    // Gera apenas nomes aleatórios quando CPF não existe
+    const randomNames = [];
+    while (randomNames.length < 6) { // Mostrar 6 nomes aleatórios
+        const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
+        
+        if (!randomNames.includes(randomName)) {
+            randomNames.push(randomName);
+        }
+    }
+    
+    shuffleArray(randomNames);
+    
+    const container = document.getElementById('names-container');
+    container.innerHTML = '';
+    
+    randomNames.forEach((name) => {
         const button = document.createElement('button');
         button.className = 'name-option';
         button.textContent = name;
@@ -217,12 +230,10 @@ function showNameSelectionScreen() {
 function buildAlternativesList(realNames) {
     const alternatives = [...realNames];
     
-    // Adicionar nomes aleatórios sem repetição
     const randomToAdd = [];
     while (randomToAdd.length < RANDOM_NAMES_COUNT) {
         const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
         
-        // Verificar se não está repetido e não está nos nomes reais
         if (!randomToAdd.includes(randomName) && !alternatives.includes(randomName)) {
             randomToAdd.push(randomName);
         }
@@ -230,18 +241,15 @@ function buildAlternativesList(realNames) {
     
     alternatives.push(...randomToAdd);
     
-    // Remover duplicatas (paranoia)
     return [...new Set(alternatives)];
 }
 
 // ==================== SELEÇÃO DE NOME ====================
 function selectName(name, buttonElement) {
-    // Desmarcar seleção anterior
     document.querySelectorAll('.name-option.selected').forEach(btn => {
         btn.classList.remove('selected');
     });
     
-    // Marcar nova seleção
     buttonElement.classList.add('selected');
     state.selectedName = name;
 }
@@ -253,22 +261,26 @@ function confirmName() {
         return;
     }
     
-    const realNames = state.matchedUsers.map(u => u.primeiro_nome);
-    
-    if (realNames.includes(state.selectedName)) {
-        // Nome correto - redirecionar diretamente (sem tela de confirmação)
-        const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
-        redirectToLink(user.link_redirecionamento);
-    } else {
-        // Nome incorreto
-        state.attemptCount++;
+    // Se CPF existe, verificar se nome está na lista
+    if (state.cpfExists) {
+        const realNames = state.matchedUsers.map(u => u.primeiro_nome);
         
-        if (state.attemptCount >= MAX_ATTEMPTS) {
-            lockAccess();
-            showLockScreen();
-        } else {
-            showErrorScreen();
+        if (realNames.includes(state.selectedName)) {
+            // Nome correto - redirecionar automaticamente
+            const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
+            redirectToLink(user.link_redirecionamento);
+            return;
         }
+    }
+    
+    // Nome incorreto (ou CPF inexistente, então qualquer nome é errado)
+    state.attemptCount++;
+    
+    if (state.attemptCount >= MAX_ATTEMPTS) {
+        lockAccess();
+        showLockScreen();
+    } else {
+        showErrorScreen();
     }
 }
 
@@ -278,10 +290,9 @@ function redirectToLink(redirectUrl) {
     const loadingRedirect = document.getElementById('loading-redirect');
     loadingRedirect.style.display = 'flex';
     
-    // Redirecionar após 1 segundo para feedback visual
     setTimeout(() => {
         window.location.href = redirectUrl;
-    }, 1000);
+    }, 1500);
 }
 
 // ==================== TELA DE ERRO ====================
@@ -303,7 +314,6 @@ function showLockScreen() {
     
     showScreen('screen-error');
     
-    // Desabilitar botão por 10 minutos
     const btnRetry = document.getElementById('btn-retry');
     btnRetry.disabled = true;
     
@@ -326,7 +336,6 @@ function lockAccess() {
     state.isLocked = true;
     state.lockEndTime = Date.now() + LOCK_TIME;
     
-    // Salvar no localStorage para persistência entre abas/sessões
     try {
         localStorage.setItem('auth_lock_end_time', state.lockEndTime.toString());
     } catch (e) {
@@ -367,8 +376,13 @@ function backToCpf() {
     state.selectedName = null;
     state.matchedUsers = [];
     state.currentCpf = null;
+    state.cpfExists = false;
     
-    document.getElementById('cpf-input').value = '';
+    const cpfInput = document.getElementById('cpf-input');
+    const cpfBackground = document.querySelector('.cpf-background');
+    
+    cpfInput.value = '';
+    cpfBackground.classList.remove('hidden');
     document.getElementById('error-cpf').textContent = '';
     document.getElementById('btn-search').disabled = false;
     document.getElementById('loading-cpf').style.display = 'none';
