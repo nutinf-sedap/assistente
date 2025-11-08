@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistente - Autenticação</title>
+    <title>Assistente NUTINF - Autenticação</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <!-- Tela 1: Entrada de CPF -->
         <div id="screen-cpf" class="screen active">
-            <h1>Sou o Atendente Virtual do NUTINF.</br>Digite os 4 primeiros dígitos do seu CPF</h1>
+            <h1>Sou o Atendente Virtual do NUTINF.<br>Digite os 4 primeiros dígitos do seu CPF</h1>
             <div class="form-group">
                 <div class="cpf-input-container">
                     <div class="cpf-visual-wrapper">
@@ -47,13 +47,13 @@
             <div class="loading" id="loading-name" style="display:none;"></div>
         </div>
 
-        <!-- Tela 3: Chat (embed do Botpress) -->
+        <!-- Tela 3: Chat (embed do Botpress) - SÓ CARREGADO APÓS VALIDAÇÃO -->
         <div id="screen-chat" class="screen">
-          <div class="chat-header">
-            <h1>Assistente</h1>
-            <button id="btn-logout-chat" class="btn btn-secondary btn-small" aria-label="Sair">SAIR</button>
-          </div>
-          <div id="bp-embedded-webchat"></div>
+            <div class="chat-header">
+                <h1>Assistente</h1>
+                <button id="btn-logout-chat" class="btn btn-secondary btn-small" aria-label="Sair">SAIR</button>
+            </div>
+            <div id="bp-embedded-webchat"></div>
         </div>
 
         <!-- Tela 4: Erro -->
@@ -65,14 +65,13 @@
                 <div class="warning-message" id="warning-message"></div>
             </div>
             <button id="btn-retry" class="btn btn-primary" aria-label="Tentar novamente">TENTAR NOVAMENTE</button>
-            <div class="loading" id="loading-retry" style="display:none;"></div>
         </div>
 
         <!-- Footer com Privacy -->
-        <div class="footer-section">
+        <div class="footer-section" id="footer-section">
             <a href="#" class="privacy-link">
                 Meus dados estão seguros?
-                <span class="tooltip">Sim, você está digitando somente 4 dígitos do CPF e o seu primeiro nome. Em comparação, o PIX pode expor bem mais dígitos do CPF e seu nome completo.</span>
+                <span class="tooltip">Sim, você está digitando somente 4 dígitos do CPF e somente o seu primeiro nome. Em comparação, o Pix expõe bem mais dígitos e seu nome completo.</span>
             </a>
         </div>
     </div>
