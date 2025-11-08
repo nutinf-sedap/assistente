@@ -738,7 +738,6 @@ select.form-control {
 }
 
 /* END PERPLEXITY DESIGN SYSTEM */
-```css
 * {
     margin: 0;
     padding: 0;
@@ -765,8 +764,10 @@ body {
     padding: var(--space-32);
     min-height: 400px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .screen {
@@ -798,12 +799,14 @@ h1 {
     text-align: center;
     font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
+    margin-bottom: var(--space-16);
 }
 
 .cpf-input-container {
@@ -851,7 +854,7 @@ h1 {
 .cpf-digit-bg {
     font-size: 80px;
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-secondary);
+    color: var(--color-gray-300);
     line-height: 1;
     width: 70px;
     text-align: center;
@@ -879,6 +882,7 @@ input[type="text"]#cpf-input {
     padding: 0;
     z-index: 2;
     caret-color: var(--color-primary);
+    font-family: var(--font-family-base);
 }
 
 input[type="text"]#cpf-input:focus {
@@ -896,14 +900,25 @@ input[type="text"]::-webkit-inner-spin-button {
 }
 
 .error-message {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-md);
     color: var(--color-error);
     text-align: center;
     min-height: var(--space-20);
 }
 
+.warning-message {
+    font-size: var(--font-size-md);
+    color: var(--color-warning);
+    text-align: center;
+    min-height: var(--space-20);
+    padding: var(--space-10);
+    background: rgba(var(--color-warning-rgb), 0.1);
+    border-left: 4px solid var(--color-warning);
+    border-radius: var(--radius-sm);
+}
+
 .btn {
-    padding: var(--space-12) var(--space-24);
+    padding: var(--space-12) var(--space-32);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     border: none;
@@ -911,12 +926,12 @@ input[type="text"]::-webkit-inner-spin-button {
     cursor: pointer;
     transition: all var(--duration-normal) var(--ease-standard);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 1px;
 }
 
 .btn:focus {
-    outline: var(--focus-outline);
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .btn-primary {
@@ -933,7 +948,6 @@ input[type="text"]::-webkit-inner-spin-button {
 
 .btn-primary:active:not(:disabled) {
     background: var(--color-primary-active);
-    transform: translateY(0);
 }
 
 .btn-primary:disabled {
@@ -954,7 +968,6 @@ input[type="text"]::-webkit-inner-spin-button {
 
 .btn-secondary:active:not(:disabled) {
     background: var(--color-secondary-active);
-    transform: translateY(0);
 }
 
 .names-grid {
@@ -971,14 +984,15 @@ input[type="text"]::-webkit-inner-spin-button {
     background: var(--color-surface);
     cursor: pointer;
     text-align: center;
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     transition: all 0.2s ease;
+    color: var(--color-text);
 }
 
 .name-option:hover {
     border-color: var(--color-primary);
-    background: var(--color-secondary);
+    background: rgba(var(--color-primary-rgb, var(--color-teal-500-rgb)), 0.05);
 }
 
 .name-option:focus {
@@ -1006,7 +1020,7 @@ input[type="text"]::-webkit-inner-spin-button {
     height: var(--space-20);
     border: 3px solid var(--color-secondary);
     border-top-color: var(--color-primary);
-    border-radius: var(--radius-full);
+    border-radius: 50%;
     animation: spin 0.6s linear infinite;
 }
 
@@ -1049,23 +1063,69 @@ input[type="text"]::-webkit-inner-spin-button {
     margin: var(--space-10) 0;
 }
 
-.attempt-info {
-    margin-top: var(--space-16);
-    padding: var(--space-12);
-    background: rgba(var(--color-warning-rgb), 0.1);
-    border-left: 4px solid var(--color-warning);
+/* Footer com tooltip */
+.footer-section {
+    margin-top: var(--space-32);
+    width: 100%;
+    text-align: center;
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-16);
+}
+
+.privacy-link {
+    position: relative;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    cursor: help;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--color-border);
+    display: inline-block;
+}
+
+.privacy-link:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.tooltip {
+    visibility: hidden;
+    width: 280px;
+    background-color: var(--color-slate-900);
+    color: var(--color-cream-50);
+    text-align: center;
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-base);
-    color: var(--color-warning);
+    padding: var(--space-12);
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -140px;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-standard);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    box-shadow: var(--shadow-md);
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-slate-900) transparent transparent transparent;
+}
+
+.privacy-link:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
 }
 
 @media (max-width: 480px) {
-    body {
-        padding: var(--space-16);
-    }
-
     .container {
-        padding: var(--space-24) var(--space-16);
+        padding: var(--space-24) var(--space-20);
     }
 
     h1 {
@@ -1074,7 +1134,6 @@ input[type="text"]::-webkit-inner-spin-button {
 
     .cpf-visual-wrapper {
         height: 100px;
-        padding: var(--space-16);
     }
 
     .cpf-digit-bg {
@@ -1084,7 +1143,7 @@ input[type="text"]::-webkit-inner-spin-button {
 
     .cpf-dot-bg {
         font-size: 30px;
-        margin: 0 var(--space-6);
+        margin: 0 var(--space-4);
     }
 
     input[type="text"]#cpf-input {
@@ -1093,21 +1152,21 @@ input[type="text"]::-webkit-inner-spin-button {
 
     .names-grid {
         grid-template-columns: 1fr;
-        gap: var(--space-8);
     }
 
     .name-option {
-        font-size: var(--font-size-lg);
-        padding: var(--space-12);
+        font-size: var(--font-size-xl);
+        padding: var(--space-16);
     }
 
     .btn {
-        padding: var(--space-10) var(--space-20);
-        font-size: var(--font-size-base);
+        padding: var(--space-12) var(--space-24);
+        font-size: var(--font-size-md);
     }
 
-    .screen {
-        gap: var(--space-16);
+    .tooltip {
+        width: 240px;
+        margin-left: -120px;
+        font-size: var(--font-size-xs);
     }
 }
-```
