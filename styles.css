@@ -746,13 +746,12 @@ select.form-control {
 
 body {
   font-family: var(--font-family-base);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-active) 100%);
+  background: var(--color-background);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-20);
-  color: var(--color-text);
 }
 
 .container {
@@ -768,12 +767,15 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
+  border: 1px solid var(--color-card-border);
 }
 
+/* Quando a tela de chat está ativa, expandir */
 .container:has(#screen-chat.active) {
   max-width: 90%;
   max-height: 90vh;
   padding: 0;
+  border-radius: var(--radius-lg);
 }
 
 .screen {
@@ -805,14 +807,12 @@ h1 {
   text-align: center;
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing-tight);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  margin-bottom: var(--space-16);
 }
 
 .cpf-input-container {
@@ -860,7 +860,7 @@ h1 {
 .cpf-digit-bg {
   font-size: 80px;
   font-weight: var(--font-weight-bold);
-  color: var(--color-text-secondary);
+  color: var(--color-gray-300);
   line-height: 1;
   width: 70px;
   text-align: center;
@@ -888,7 +888,6 @@ input[type="text"]#cpf-input {
   padding: 0;
   z-index: 2;
   caret-color: var(--color-primary);
-  font-family: var(--font-family-base);
 }
 
 input[type="text"]#cpf-input:focus {
@@ -918,7 +917,7 @@ input[type="text"]::-webkit-inner-spin-button {
   text-align: center;
   min-height: var(--space-20);
   padding: var(--space-10);
-  background: rgba(var(--color-warning-rgb), var(--status-bg-opacity));
+  background: rgba(var(--color-warning-rgb), 0.1);
   border-left: 4px solid var(--color-warning);
   border-radius: var(--radius-sm);
 }
@@ -933,7 +932,6 @@ input[type="text"]::-webkit-inner-spin-button {
   transition: all var(--duration-normal) var(--ease-standard);
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-family: var(--font-family-base);
 }
 
 .btn:focus {
@@ -942,14 +940,19 @@ input[type="text"]::-webkit-inner-spin-button {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-active) 100%);
+  background: var(--color-primary);
   color: var(--color-btn-primary-text);
   width: 100%;
 }
 
 .btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(var(--color-primary-rgb), 0.4);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--color-primary-active);
 }
 
 .btn-primary:disabled {
@@ -968,8 +971,12 @@ input[type="text"]::-webkit-inner-spin-button {
   transform: translateY(-2px);
 }
 
+.btn-secondary:active:not(:disabled) {
+  background: var(--color-secondary-active);
+}
+
 .btn-small {
-  padding: var(--space-10) var(--space-16);
+  padding: var(--space-8) var(--space-16);
   font-size: var(--font-size-sm);
   width: auto;
 }
@@ -990,13 +997,13 @@ input[type="text"]::-webkit-inner-spin-button {
   text-align: center;
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-standard);
   color: var(--color-text);
 }
 
 .name-option:hover {
   border-color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb), 0.05);
+  background: var(--color-secondary);
 }
 
 .name-option:focus {
@@ -1006,7 +1013,7 @@ input[type="text"]::-webkit-inner-spin-button {
 }
 
 .name-option.selected {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-active) 100%);
+  background: var(--color-primary);
   color: var(--color-btn-primary-text);
   border-color: var(--color-primary);
 }
@@ -1055,7 +1062,7 @@ input[type="text"]::-webkit-inner-spin-button {
   margin: var(--space-10) 0;
 }
 
-/* ==================== TELA DE CHAT - EXPANDIDA ====================*/
+/* ==================== TELA DE CHAT - COMPLETA ====================*/
 
 #screen-chat {
   padding: 0 !important;
@@ -1064,6 +1071,13 @@ input[type="text"]::-webkit-inner-spin-button {
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.screen-chat-full {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .chat-header {
@@ -1085,9 +1099,12 @@ input[type="text"]::-webkit-inner-spin-button {
 #bp-embedded-webchat {
   flex: 1;
   min-height: 500px;
-  max-height: 75vh;
+  max-height: calc(90vh - 80px);
   overflow: auto;
   width: 100%;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* ==================== FOOTER ====================*/
@@ -1096,8 +1113,13 @@ input[type="text"]::-webkit-inner-spin-button {
   margin-top: var(--space-32);
   width: 100%;
   text-align: center;
-  border-top: 1px solid var(--color-card-border);
+  border-top: 1px solid var(--color-border);
   padding-top: var(--space-16);
+}
+
+/* Esconder footer quando chat estiver ativo */
+#screen-chat.active ~ .footer-section {
+  display: none;
 }
 
 .privacy-link {
@@ -1131,8 +1153,8 @@ input[type="text"]::-webkit-inner-spin-button {
   opacity: 0;
   transition: opacity var(--duration-normal) var(--ease-standard);
   font-size: var(--font-size-sm);
-  line-height: var(--line-height-normal);
-  box-shadow: var(--shadow-md);
+  line-height: var(--line-height-tight);
+  box-shadow: var(--shadow-lg);
 }
 
 .tooltip::after {
@@ -1159,13 +1181,14 @@ input[type="text"]::-webkit-inner-spin-button {
   }
 
   .container {
-    padding: var(--space-24) var(--space-20);
+    padding: var(--space-24) var(--space-16);
   }
 
   .container:has(#screen-chat.active) {
     max-width: 100%;
     max-height: 100vh;
     border-radius: 0;
+    padding: 0;
   }
 
   h1 {
@@ -1174,6 +1197,7 @@ input[type="text"]::-webkit-inner-spin-button {
 
   .cpf-visual-wrapper {
     height: 100px;
+    padding: var(--space-16);
   }
 
   .cpf-digit-bg {
@@ -1201,7 +1225,7 @@ input[type="text"]::-webkit-inner-spin-button {
   }
 
   .btn {
-    padding: var(--space-12) var(--space-24);
+    padding: var(--space-10) var(--space-20);
     font-size: var(--font-size-base);
   }
 
@@ -1216,7 +1240,7 @@ input[type="text"]::-webkit-inner-spin-button {
   }
 
   #screen-chat {
-    min-height: 100%;
+    min-height: 100vh;
     max-height: 100vh;
   }
 
@@ -1228,5 +1252,13 @@ input[type="text"]::-webkit-inner-spin-button {
   .chat-header {
     flex-wrap: wrap;
     padding: var(--space-16);
+  }
+
+  .screen {
+    gap: var(--space-16);
+  }
+
+  .form-group {
+    gap: var(--space-6);
   }
 }
