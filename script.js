@@ -1,5 +1,5 @@
 // ==================== CONFIGURAÇÃO ====================
-const GIST_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/'; // Substitua pelos seus valores
+const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/'; // Substitua pelos seus valores
 const RANDOM_NAMES_COUNT = 4;
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 10 * 60 * 1000; // 10 minutos em ms
