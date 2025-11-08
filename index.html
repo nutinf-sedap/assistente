@@ -12,15 +12,23 @@
         <div id="screen-cpf" class="screen active">
             <h1>Digite os 4 primeiros dígitos do seu CPF</h1>
             <div class="form-group">
-                <input 
-                    id="cpf-input" 
-                    type="text" 
-                    inputmode="numeric" 
-                    pattern="\d{4}" 
-                    maxlength="4" 
-                    placeholder="0000"
-                    aria-label="CPF - primeiros 4 dígitos"
-                >
+                <div class="cpf-input-wrapper">
+                    <div class="cpf-placeholder">
+                        <span>•</span>
+                        <span>•</span>
+                        <span>•</span>
+                        <span>•</span>
+                    </div>
+                    <input 
+                        id="cpf-input" 
+                        type="text" 
+                        inputmode="numeric" 
+                        pattern="\d{4}" 
+                        maxlength="4" 
+                        placeholder="0000"
+                        aria-label="CPF - primeiros 4 dígitos"
+                    >
+                </div>
                 <div class="error-message" id="error-cpf"></div>
             </div>
             <button id="btn-search" class="btn btn-primary" aria-label="Buscar registros">AVANÇAR</button>
@@ -44,8 +52,7 @@
                 <h1>Acesso Confirmado!</h1>
                 <p id="success-message">Redirecionando...</p>
             </div>
-            <button id="btn-access" class="btn btn-primary" style="display:none;" aria-label="Acessar">ACESSAR</button>
-            <div class="loading" id="loading-redirect" style="display:none;"></div>
+            <div class="loading" id="loading-redirect"></div>
         </div>
 
         <!-- Tela 4: Erro -->
