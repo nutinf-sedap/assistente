@@ -102,7 +102,7 @@ function showScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 
   const footer = document.querySelector('.footer-section');
-  footer.style.marginTop = (screenId === 'screen-cpf') ? '56px' : '24px';
+  footer.style.marginTop = (screenId === 'screen-cpf') ? '560px' : '24px';
 }
 
 // ==================== BUSCA DE CPF ====================
