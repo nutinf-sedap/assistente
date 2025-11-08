@@ -47,7 +47,7 @@
             <div class="loading" id="loading-name" style="display:none;"></div>
         </div>
 
-        <!-- Tela 3: Sucesso (apenas loading, sem botão) -->
+        <!-- Tela 3: Sucesso -->
         <div id="screen-success" class="screen">
             <div class="success-content">
                 <div class="success-icon">✓</div>
@@ -63,10 +63,18 @@
                 <div class="error-icon">✕</div>
                 <h1>Acesso Negado</h1>
                 <p id="error-text">O nome selecionado não corresponde aos nossos registros.</p>
-                <div class="attempt-info" id="attempt-info"></div>
+                <div class="warning-message" id="warning-message"></div>
             </div>
             <button id="btn-retry" class="btn btn-primary" aria-label="Tentar novamente">TENTAR NOVAMENTE</button>
             <div class="loading" id="loading-retry" style="display:none;"></div>
+        </div>
+
+        <!-- Footer com Privacy -->
+        <div class="footer-section">
+            <a href="#" class="privacy-link">
+                Meus dados estão seguros?
+                <span class="tooltip">Sim, você está digitando somente 4 dígitos do CPF e somente o seu primeiro nome. Em comparação, o Pix expõe bem mais dígitos e seu nome completo.</span>
+            </a>
         </div>
     </div>
 
