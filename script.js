@@ -1,5 +1,5 @@
 // ==================== CONFIGURAÇÃO ====================
-const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/'; // Substitua pelos seus valores
+const GIST_URL = 'https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/'; // Substitua pelos seus valores
 const RANDOM_NAMES_COUNT = 4;
 const MAX_ATTEMPTS = 5;
 const LOCK_TIME = 10 * 60 * 1000; // 10 minutos em ms
@@ -45,40 +45,42 @@ function getDefaultRandomNamesList() {
         'Sergio', 'Paulo', 'Luis', 'Fabio', 'Claudio', 'Marcelo', 'Mateus', 'Andre',
         'Edson', 'Leandro', 'Thiago', 'Mauricio', 'Gabriel', 'Henrique', 'Leonardo', 'Samuel',
         'Gilson', 'Denis', 'Otavio', 'Vinicius', 'Joao', 'Jose', 'Manuel', 'Vicente',
-        'Inacio', 'Anastacio', 'Anibal', 'Anselmo', 'Apolonio', 'Ariosto', 'Armando', 'Arnaldo',
-        'Arsênio', 'Artemio', 'Augusto', 'Aurelio', 'Aureliano', 'Ausonio', 'Avelino', 'Avery',
-        'Ayrton', 'Azarias', 'Baltasar', 'Baltazar', 'Banilson', 'Belmiro', 'Beltrão', 'Benedito',
-        'Benilson', 'Beno', 'Benoit', 'Benoni', 'Benvenuto', 'Berevino', 'Berfino', 'Berilo',
-        'Brinaldo', 'Brás', 'Braulio', 'Braz', 'Breno', 'Brás', 'Brito', 'Brittão',
-        'Brás', 'Buenaventura', 'Caetano', 'Caetão', 'Caiçara', 'Caio', 'Cais', 'Caison',
-        'Cajetano', 'Calamaco', 'Calcídio', 'Calcídeo', 'Caldas', 'Caldeira', 'Calderão', 'Calderino',
-        'Calderôes', 'Caldez', 'Calderizo', 'Caldezio', 'Calfucão', 'Caligula', 'Calimaco', 'Calinada',
-        'Calístenes', 'Calisto', 'Califoro', 'Calobrino', 'Calofrino', 'Calomino', 'Calomiro', 'Calomizo',
-        'Calonio', 'Calonizio', 'Calorino', 'Calorizio', 'Calorizo', 'Calotipo', 'Calovano', 'Calozário',
-        'Calozaro', 'Calozairo', 'Calusto', 'Calusão', 'Calusário', 'Calusarro', 'Calusiro', 'Calusizu',
-        'Calusto', 'Caluto', 'Calvacande', 'Calvacante', 'Calvacanti', 'Calvacantio', 'Calvacanto', 'Calvacin',
-        'Calvácio', 'Calvácti', 'Calvada', 'Calvadore', 'Calvadori', 'Calvadoro', 'Calvadoso', 'Calvadouro',
-        'Calvaduz', 'Calvaço', 'Calvahano', 'Calvajano', 'Calvajau', 'Calvajeiro', 'Calvajildo', 'Calvajildo',
-        'Calvajilho', 'Calvajuche', 'Calvajudo', 'Calvala', 'Calvalada', 'Calvaladelo', 'Calvaladera', 'Cavaladerim',
-        'Cavaladezia', 'Cavaladeza', 'Cavaladezo', 'Cavaladi', 'Cavaladiana', 'Cavaladiano', 'Cavaladiao', 'Cavaladina',
-        'Cavaladino', 'Cavaladio', 'Cavaladoel', 'Cavaladoga', 'Cavaladote', 'Cavalador', 'Cavaladora', 'Cavaladoraia',
-        // Femininos
+        'Inacio', 'Anselmo', 'Apolonio', 'Ariosto', 'Armando', 'Arnaldo', 'Artemio', 'Augusto',
+        'Aurelio', 'Aureliano', 'Avelino', 'Ayrton', 'Baltasar', 'Baltazar', 'Belmiro', 'Beltrão',
+        'Benedito', 'Benilson', 'Beno', 'Benoni', 'Benvenuto', 'Berilo', 'Brinaldo', 'Brás',
+        'Braulio', 'Breno', 'Brito', 'Buenaventura', 'Caetano', 'Caio', 'Cais', 'Caison',
+        'Cajetano', 'Calderão', 'Calderino', 'Calígula', 'Calimaco', 'Calisto', 'Califoro', 'Calorino',
+        'Calotipo', 'Calusto', 'Calvacante', 'Calvacanti', 'Calvacinto', 'Calvada', 'Cavalador', 'Cavalado',
+        'Cavalala', 'Cavalali', 'Cavalalo', 'Cavalamo', 'Cavalana', 'Cavalano', 'Cavalanto', 'Cavalapa',
+        'Cavalapol', 'Cavalapo', 'Cavalapoli', 'Cavalar', 'Cavalara', 'Cavalaran', 'Cavalarani', 'Cavalare',
+        'Cavalarei', 'Cavalareir', 'Cavalareta', 'Cavalaretão', 'Cavalareto', 'Cavalareza', 'Cavalarezado', 'Cavalarezi',
+        'Cavalarezim', 'Cavalarezinha', 'Cavalarfil', 'Cavalarfio', 'Cavalarfiol', 'Cavalarfira', 'Cavalarfol', 'Cavalarfo',
+        'Cavalarfol', 'Cavalarfoli', 'Cavalarfolo', 'Cavalarfora', 'Cavalarfori', 'Cavalarforio', 'Cavalari', 'Cavalaria',
+        'Cavalarin', 'Cavalarino', 'Cavalario', 'Cavalarita', 'Cavalariz', 'Cavalariza', 'Cavalarizo', 'Cavalarizu',
+        'Cavalarona', 'Cavalarono', 'Cavalaro', 'Cavalaroa', 'Cavalaroan', 'Cavalaron', 'Cavalarona', 'Cavalarone',
+        'Cavalaronha', 'Cavalaronia', 'Cavalaronio', 'Cavalars', 'Cavalarsa', 'Cavalarson', 'Cavalarso', 'Cavalarsu',
+        'Cavalarsu', 'Cavalarsu', 'Cavalarsu', 'Cavalarsu', 'Cavalarza', 'Cavalarzan', 'Cavalarzo', 'Cavalarzu',
+        'Cavalarzu', 'Cavalarzu', 'Cavalarzu', 'Cavalarzu',
         'Ana', 'Beatriz', 'Carla', 'Daniela', 'Elisa', 'Fernanda', 'Gabriela', 'Heloisa',
         'Iris', 'Joana', 'Katarina', 'Laura', 'Mariana', 'Natalia', 'Olivia', 'Patricia',
         'Quinete', 'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Ximena',
         'Yasmin', 'Zelia', 'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Aileen',
         'Aileyana', 'Aileyne', 'Ailsa', 'Aima', 'Aimara', 'Aimarinha', 'Aina', 'Ainara',
-        'Ainarja', 'Ainayne', 'Aindreia', 'Aindria', 'Aineah', 'Aineide', 'Aineide', 'Aineire',
-        'Aineire', 'Ainelice', 'Ainelia', 'Ainelice', 'Ainelis', 'Aineliz', 'Ainelyda', 'Ainelzira',
-        'Ainema', 'Ainemara', 'Ainemaracileira', 'Ainemilena', 'Ainemir', 'Ainemira', 'Ainena', 'Ainenara',
-        'Ainenilda', 'Ainenilda', 'Ainenilda', 'Ainenice', 'Ainenice', 'Ainenicilda', 'Ainenida', 'Ainenilda',
-        'Ainenilda', 'Ainenildo', 'Ainenildo', 'Ainenilda', 'Ainenilda', 'Ainenilda', 'Ainenildo', 'Ainenilda',
-        'Aimene', 'Aimenia', 'Aimenia', 'Aimenica', 'Aimenicada', 'Aimenaida', 'Aimenaides', 'Aimenarda',
-        'Aimenblanda', 'Aimenberta', 'Aimenblanca', 'Aimenblanca', 'Aimenblanca', 'Aimenblanca', 'Aimenblanca', 'Aimenblanca',
-        'Aimencada', 'Aimencara', 'Aimencarina', 'Aimencasa', 'Aimencatarina', 'Aimencatarina', 'Aimencatarina', 'Aimencatarina',
-        'Aimencecilia', 'Aimencelia', 'Aimencendalia', 'Aimencendalia', 'Aimencenda', 'Aimencenda', 'Aimencenda', 'Aimencenda',
-        'Aimencenilda', 'Aimencenilda', 'Aimencenilda', 'Aimencenicileia', 'Aimencenicileia', 'Aimencenicilia', 'Aimencenicilia', 'Aimencenicilia',
-        'Aimencenice', 'Aimencenice', 'Aimencenice', 'Aimenceniceia', 'Aimenceniceia', 'Aimenceniceia', 'Aimenceniceia', 'Aimenceniceia'
+        'Ainarja', 'Ainayne', 'Aindreia', 'Aindria', 'Aineah', 'Aineide', 'Aineire', 'Ainelice',
+        'Ainelia', 'Ainelis', 'Aineliz', 'Ainelyda', 'Ainelzira', 'Ainema', 'Ainemara', 'Ainemilena',
+        'Ainemir', 'Ainemira', 'Ainena', 'Ainenara', 'Ainenilda', 'Ainenice', 'Ainenildo', 'Aimene',
+        'Aimenia', 'Aimenica', 'Aimenaida', 'Aimenaides', 'Aimenarda', 'Aimenblanda', 'Aimenberta', 'Aimenblanca',
+        'Aimencada', 'Aimencara', 'Aimencarina', 'Aimencasa', 'Aimencatarina', 'Aimencecilia', 'Aimencelia', 'Aimencendalia',
+        'Aimencenda', 'Aimencenilda', 'Aimencenicileia', 'Aimencenicilia', 'Aimencenice', 'Aimenceniceia', 'Aimencenicela', 'Aimencera',
+        'Aimenceres', 'Aimencerina', 'Aimencerita', 'Aimenceriza', 'Aimencesa', 'Aimencesinda', 'Aimencesita', 'Aimencesia',
+        'Aimencezia', 'Aimencezilda', 'Aimencezina', 'Aimencezinha', 'Aimencezita', 'Aimencezilda', 'Aimencezinda', 'Aimencezinha',
+        'Aimencezita', 'Aimencezora', 'Aimencezuda', 'Aimencezuida', 'Aimencezuina', 'Aimencezuinha', 'Aimencezuita', 'Aimencezuizilda',
+        'Aimencezuizina', 'Aimencezuizinha', 'Aimencezuizita', 'Aimencezuizora', 'Aimencezuizuda', 'Aimenclara', 'Aimenclere', 'Aimencleria',
+        'Aimensetina', 'Aimensilda', 'Aimensiliana', 'Aimensilina', 'Aimensilinda', 'Aimensilinha', 'Aimensilita', 'Aimensilizilda',
+        'Aimensilizina', 'Aimensilizinha', 'Aimensilizita', 'Aimensilizora', 'Aimensilizuda', 'Aimensilizuida', 'Aimensilizuina', 'Aimensilizuinha',
+        'Aimensilva', 'Aimensa', 'Aimensada', 'Aimensadela', 'Aimensadera', 'Aimensaderim', 'Aimensadezia', 'Aimensadeza',
+        'Aimensadezo', 'Aimensadi', 'Aimensadiana', 'Aimensadiano', 'Aimensadiao', 'Aimensadina', 'Aimensadino', 'Aimensadio',
+        'Aimensadoel', 'Aimensadoga', 'Aimensadote', 'Aimensador', 'Aimensadora', 'Aimensadoraia', 'Aimensadoraia', 'Aimensadorela'
     ];
 }
 
@@ -106,9 +108,8 @@ function setupEventListeners() {
     document.getElementById('btn-confirm-name').addEventListener('click', confirmName);
     document.getElementById('btn-back-to-cpf').addEventListener('click', backToCpf);
     
-    // Tela de Erro e Sucesso
+    // Tela de Erro
     document.getElementById('btn-retry').addEventListener('click', backToCpf);
-    document.getElementById('btn-access').addEventListener('click', redirectToLink);
 }
 
 // ==================== FUNÇÕES DE TELA ====================
@@ -255,9 +256,9 @@ function confirmName() {
     const realNames = state.matchedUsers.map(u => u.primeiro_nome);
     
     if (realNames.includes(state.selectedName)) {
-        // Nome correto - redirecionar
+        // Nome correto - redirecionar diretamente (sem tela de confirmação)
         const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
-        showSuccessScreen(user.link_redirecionamento);
+        redirectToLink(user.link_redirecionamento);
     } else {
         // Nome incorreto
         state.attemptCount++;
@@ -271,19 +272,16 @@ function confirmName() {
     }
 }
 
-// ==================== TELA DE SUCESSO ====================
-function showSuccessScreen(redirectUrl) {
-    const btnAccess = document.getElementById('btn-access');
-    const loadingRedirect = document.getElementById('loading-redirect');
-    
-    document.getElementById('success-message').textContent = 'Acesso concedido com sucesso!';
-    btnAccess.style.display = 'inline-block';
-    loadingRedirect.style.display = 'none';
-    
-    // Armazenar URL para redirecionamento
-    state.redirectUrl = redirectUrl;
-    
+// ==================== REDIRECIONAMENTO AUTOMÁTICO ====================
+function redirectToLink(redirectUrl) {
     showScreen('screen-success');
+    const loadingRedirect = document.getElementById('loading-redirect');
+    loadingRedirect.style.display = 'flex';
+    
+    // Redirecionar após 1 segundo para feedback visual
+    setTimeout(() => {
+        window.location.href = redirectUrl;
+    }, 1000);
 }
 
 // ==================== TELA DE ERRO ====================
@@ -376,13 +374,6 @@ function backToCpf() {
     document.getElementById('loading-cpf').style.display = 'none';
     
     showScreen('screen-cpf');
-}
-
-// ==================== REDIRECIONAMENTO ====================
-function redirectToLink() {
-    if (state.redirectUrl) {
-        window.location.href = state.redirectUrl;
-    }
 }
 
 // ==================== UTILITÁRIOS ====================
