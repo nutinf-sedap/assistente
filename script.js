@@ -1,5 +1,6 @@
-// ==================== CONFIGURAÇÃO DO BOTPRESS ====================
+// ==================== CONFIGURAÇÃO ====================
 
+// Mapeamento de links do Gist para grupos e seus embeds do Botpress
 const BOTPRESS_EMBEDS = {
   'https://exemplo.com/grupo1': {
     grupo: 'grupo1',
@@ -21,7 +22,6 @@ const BOTPRESS_EMBEDS = {
   }
 };
 
-
 const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/';
 const RANDOM_NAMES_COUNT = 4;
 
@@ -31,13 +31,11 @@ let state = {
   currentCpf: null,
   matchedUsers: [],
   selectedName: null,
-  isLocked: false,
-  lockEndTime: null,
   cpfExists: false,
-  currentGroupKey: null // Para saber qual grupo está ativo
+  currentGroupKey: null,
+  botpressLoaded: false
 };
 
-// Lista de nomes aleatórios
 let randomNamesList = [];
 
 // ==================== INICIALIZAÇÃO ====================
@@ -45,10 +43,10 @@ let randomNamesList = [];
 document.addEventListener('DOMContentLoaded', () => {
   loadRandomNamesList();
   setupEventListeners();
-  checkIfLocked();
+  // NÃO carregar Botpress aqui!
 });
 
-// ==================== CARREGAMENTO DE DADOS ====================
+// ==================== CARREGAMENTO DE NOMES ====================
 
 async function loadRandomNamesList() {
   try {
@@ -115,7 +113,7 @@ function setupEventListeners() {
   btnSearch.addEventListener('click', searchCpf);
   document.getElementById('btn-confirm-name').addEventListener('click', confirmName);
   document.getElementById('btn-back-to-cpf').addEventListener('click', backToCpf);
-  document.getElementById('btn-logout-chat').addEventListener('click', backToCpf);
+  document.getElementById('btn-logout-chat').addEventListener('click', logoutChat);
   document.getElementById('btn-retry').addEventListener('click', backToCpf);
   
   document.querySelector('.privacy-link').addEventListener('click', (e) => {
@@ -298,7 +296,8 @@ function confirmName() {
     
     if (realNames.includes(state.selectedName)) {
       const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
-      openBotpressEmbed(user.link_redirecionamento);
+      // APÓS VALIDAÇÃO CORRETA, CARREGAR O BOTPRESS
+      loadBotpressEmbed(user.link_redirecionamento);
       return;
     }
   }
@@ -306,10 +305,9 @@ function confirmName() {
   showErrorScreen();
 }
 
-// ==================== ABRIR EMBED DO BOTPRESS ====================
+// ==================== CARREGAR BOTPRESS APENAS APÓS VALIDAÇÃO ====================
 
-function openBotpressEmbed(groupLink) {
-  // Verificar se o link está mapeado nos embeds
+function loadBotpressEmbed(groupLink) {
   if (!BOTPRESS_EMBEDS[groupLink]) {
     console.error('Link não mapeado nos embeds:', groupLink);
     showErrorScreen();
@@ -319,39 +317,54 @@ function openBotpressEmbed(groupLink) {
   const embedConfig = BOTPRESS_EMBEDS[groupLink];
   state.currentGroupKey = groupLink;
   
-  // Limpar scripts Botpress anteriores
-  document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
-  
-  // Limpar container anterior
+  // Limpar container
   const container = document.getElementById(embedConfig.container_id);
   if (container) {
     container.innerHTML = '';
   }
   
-  // Mostrar a tela de chat
+  // Remover scripts antigos
+  document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
+  
+  // Mostrar tela de chat
   showScreen('screen-chat');
   
-  // Injetar o script de inject primeiro
+  // Injetar scripts APÓS a tela estar visível
+  setTimeout(() => {
+    injectBotpressScripts(embedConfig);
+  }, 100);
+}
+
+function injectBotpressScripts(embedConfig) {
+  // Injetar script de inject
   const injectScript = document.createElement('script');
   injectScript.src = embedConfig.inject_script;
   injectScript.setAttribute('data-embed', 'botpress');
+  injectScript.async = true;
+  
   injectScript.onload = () => {
-    // Após injetar, carregar o config/bundle
+    // Após inject carregar, injetar config
     const configScript = document.createElement('script');
     configScript.src = embedConfig.config_script;
     configScript.defer = true;
     configScript.setAttribute('data-embed', 'botpress');
+    
     configScript.onload = () => {
-      // Aguardar um pouco para o Botpress inicializar
-      setTimeout(() => {
-        // Tentar usar a API do Botpress se disponível
-        if (window.botpressWebChat) {
-          window.botpressWebChat.sendEvent({ type: 'LIFECYCLE.LOADED' });
-        }
-      }, 500);
+      state.botpressLoaded = true;
+      console.log('Botpress carregado com sucesso no grupo:', embedConfig.grupo);
     };
+    
+    configScript.onerror = () => {
+      console.error('Erro ao carregar config do Botpress');
+    };
+    
     document.body.appendChild(configScript);
   };
+  
+  injectScript.onerror = () => {
+    console.error('Erro ao carregar inject do Botpress');
+  };
+  
   document.body.appendChild(injectScript);
 }
 
@@ -364,23 +377,6 @@ function showErrorScreen() {
   showScreen('screen-error');
 }
 
-// ==================== BLOQUEIO DE ACESSO (BÁSICO) ====================
-
-function checkIfLocked() {
-  try {
-    const lockEndTime = localStorage.getItem('auth_lock_end_time');
-    if (lockEndTime) {
-      const endTime = parseInt(lockEndTime);
-      if (Date.now() < endTime) {
-        state.isLocked = true;
-        state.lockEndTime = endTime;
-      }
-    }
-  } catch (e) {
-    console.warn('localStorage não disponível');
-  }
-}
-
 // ==================== NAVEGAÇÃO ====================
 
 function backToCpf() {
@@ -390,8 +386,17 @@ function backToCpf() {
   state.cpfExists = false;
   state.currentGroupKey = null;
   
-  // Remover scripts do Botpress ao voltar
+  // Remover scripts do Botpress completamente
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
+  
+  // Limpar container
+  const container = document.getElementById('bp-embedded-webchat');
+  if (container) {
+    container.innerHTML = '';
+  }
+  
+  // Reset do estado
+  state.botpressLoaded = false;
   
   const cpfInput = document.getElementById('cpf-input');
   const cpfBackground = document.querySelector('.cpf-background');
@@ -403,6 +408,10 @@ function backToCpf() {
   document.getElementById('loading-cpf').style.display = 'none';
   
   showScreen('screen-cpf');
+}
+
+function logoutChat() {
+  backToCpf();
 }
 
 // ==================== UTILITÁRIOS ====================
