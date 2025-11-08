@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente - Autenticação</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Tela 1: Entrada de CPF -->
+        <div id="screen-cpf" class="screen active">
+            <h1>Digite os 4 primeiros dígitos do seu CPF</h1>
+            <div class="form-group">
+                <input 
+                    id="cpf-input" 
+                    type="text" 
+                    inputmode="numeric" 
+                    pattern="\d{4}" 
+                    maxlength="4" 
+                    placeholder="0000"
+                    aria-label="CPF - primeiros 4 dígitos"
+                >
+                <div class="error-message" id="error-cpf"></div>
+            </div>
+            <button id="btn-search" class="btn btn-primary" aria-label="Buscar registros">AVANÇAR</button>
+            <div class="loading" id="loading-cpf" style="display:none;"></div>
+        </div>
+
+        <!-- Tela 2: Seleção de Nome -->
+        <div id="screen-name" class="screen">
+            <h1>Dentre as alternativas abaixo, qual o seu primeiro nome?</h1>
+            <div class="names-grid" id="names-container"></div>
+            <button id="btn-confirm-name" class="btn btn-primary" aria-label="Confirmar seleção de nome">AVANÇAR</button>
+            <button id="btn-back-to-cpf" class="btn btn-secondary" aria-label="Voltar para entrada de CPF">VOLTAR</button>
+            <div class="error-message" id="error-name"></div>
+            <div class="loading" id="loading-name" style="display:none;"></div>
+        </div>
+
+        <!-- Tela 3: Sucesso -->
+        <div id="screen-success" class="screen">
+            <div class="success-content">
+                <div class="success-icon">✓</div>
+                <h1>Acesso Confirmado!</h1>
+                <p id="success-message">Redirecionando...</p>
+            </div>
+            <button id="btn-access" class="btn btn-primary" style="display:none;" aria-label="Acessar">ACESSAR</button>
+            <div class="loading" id="loading-redirect" style="display:none;"></div>
+        </div>
+
+        <!-- Tela 4: Erro -->
+        <div id="screen-error" class="screen">
+            <div class="error-content">
+                <div class="error-icon">✕</div>
+                <h1>Acesso Negado</h1>
+                <p id="error-text">O nome selecionado não corresponde aos nossos registros.</p>
+                <div class="attempt-info" id="attempt-info"></div>
+            </div>
+            <button id="btn-retry" class="btn btn-primary" aria-label="Tentar novamente">TENTAR NOVAMENTE</button>
+            <div class="loading" id="loading-retry" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
