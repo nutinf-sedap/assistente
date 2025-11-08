@@ -1,29 +1,26 @@
-// ==================== CONFIGURAÇÃO ====================
+// ==================== CONFIGURAÇÃO DO BOTPRESS ====================
 
-// Mapeamento de links do Gist para grupos e seus embeds do Botpress
 const BOTPRESS_EMBEDS = {
   'https://exemplo.com/grupo1': {
     grupo: 'grupo1',
-    scripts: [
-      'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-      'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js'
-    ]
+    inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js',
+    container_id: 'bp-embedded-webchat'
   },
   'https://exemplo.com/grupo2': {
     grupo: 'grupo2',
-    scripts: [
-      'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-      'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO2.js'
-    ]
+    inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO2.js',
+    container_id: 'bp-embedded-webchat'
   },
   'https://exemplo.com/grupo3': {
     grupo: 'grupo3',
-    scripts: [
-      'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-      'https://files.bpcontent.cloud/2025/11/08/01/TERCEIRO-ID-GRUPO3.js'
-    ]
+    inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/TERCEIRO-ID-GRUPO3.js',
+    container_id: 'bp-embedded-webchat'
   }
 };
+
 
 const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/';
 const RANDOM_NAMES_COUNT = 4;
@@ -326,20 +323,36 @@ function openBotpressEmbed(groupLink) {
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
   
   // Limpar container anterior
-  const chatContainer = document.getElementById('chat-container');
-  chatContainer.innerHTML = '<div id="bp-widget-container"></div>';
-  
-  // Injetar scripts do Botpress
-  embedConfig.scripts.forEach((src, index) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.defer = true;
-    script.setAttribute('data-embed', 'botpress');
-    document.body.appendChild(script);
-  });
+  const container = document.getElementById(embedConfig.container_id);
+  if (container) {
+    container.innerHTML = '';
+  }
   
   // Mostrar a tela de chat
   showScreen('screen-chat');
+  
+  // Injetar o script de inject primeiro
+  const injectScript = document.createElement('script');
+  injectScript.src = embedConfig.inject_script;
+  injectScript.setAttribute('data-embed', 'botpress');
+  injectScript.onload = () => {
+    // Após injetar, carregar o config/bundle
+    const configScript = document.createElement('script');
+    configScript.src = embedConfig.config_script;
+    configScript.defer = true;
+    configScript.setAttribute('data-embed', 'botpress');
+    configScript.onload = () => {
+      // Aguardar um pouco para o Botpress inicializar
+      setTimeout(() => {
+        // Tentar usar a API do Botpress se disponível
+        if (window.botpressWebChat) {
+          window.botpressWebChat.sendEvent({ type: 'LIFECYCLE.LOADED' });
+        }
+      }, 500);
+    };
+    document.body.appendChild(configScript);
+  };
+  document.body.appendChild(injectScript);
 }
 
 // ==================== TELA DE ERRO ====================
