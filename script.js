@@ -1,341 +1,403 @@
 // ==================== CONFIGURAÇÃO ====================
-const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/'; // Substitua pelos seus valores
+
+// Mapeamento de links do Gist para grupos e seus embeds do Botpress
+const BOTPRESS_EMBEDS = {
+  'https://exemplo.com/grupo1': {
+    grupo: 'grupo1',
+    scripts: [
+      'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
+      'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js'
+    ]
+  },
+  'https://exemplo.com/grupo2': {
+    grupo: 'grupo2',
+    scripts: [
+      'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
+      'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO2.js'
+    ]
+  },
+  'https://exemplo.com/grupo3': {
+    grupo: 'grupo3',
+    scripts: [
+      'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
+      'https://files.bpcontent.cloud/2025/11/08/01/TERCEIRO-ID-GRUPO3.js'
+    ]
+  }
+};
+
+const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/';
 const RANDOM_NAMES_COUNT = 4;
 
 // ==================== ESTADO GLOBAL ====================
+
 let state = {
-    currentCpf: null,
-    matchedUsers: [],
-    selectedName: null,
-    isLocked: false,
-    lockEndTime: null,
-    cpfExists: false // Flag para saber se o CPF existe na base
+  currentCpf: null,
+  matchedUsers: [],
+  selectedName: null,
+  isLocked: false,
+  lockEndTime: null,
+  cpfExists: false,
+  currentGroupKey: null // Para saber qual grupo está ativo
 };
 
 // Lista de nomes aleatórios
 let randomNamesList = [];
 
 // ==================== INICIALIZAÇÃO ====================
+
 document.addEventListener('DOMContentLoaded', () => {
-    loadRandomNamesList();
-    setupEventListeners();
-    checkIfLocked();
+  loadRandomNamesList();
+  setupEventListeners();
+  checkIfLocked();
 });
 
 // ==================== CARREGAMENTO DE DADOS ====================
+
 async function loadRandomNamesList() {
-    try {
-        randomNamesList = getDefaultRandomNamesList();
-    } catch (error) {
-        console.error('Erro ao carregar lista de nomes:', error);
-        randomNamesList = getDefaultRandomNamesList();
-    }
+  try {
+    randomNamesList = getDefaultRandomNamesList();
+  } catch (error) {
+    console.error('Erro ao carregar lista de nomes:', error);
+    randomNamesList = getDefaultRandomNamesList();
+  }
 }
 
 function getDefaultRandomNamesList() {
-    return [
-        'Roberto', 'Carlos', 'Francisco', 'Antonio', 'Marcos', 'Alexandre', 'Felipe', 'Diego',
-        'Bruno', 'Ricardo', 'Rodrigo', 'Gustavo', 'Lucas', 'Daniel', 'Rafael', 'Fernando',
-        'Sergio', 'Paulo', 'Luis', 'Fabio', 'Claudio', 'Marcelo', 'Mateus', 'Andre',
-        'Edson', 'Leandro', 'Thiago', 'Mauricio', 'Gabriel', 'Henrique', 'Leonardo', 'Samuel',
-        'Gilson', 'Denis', 'Otavio', 'Vinicius', 'Joao', 'Jose', 'Manuel', 'Vicente',
-        'Inacio', 'Anselmo', 'Apolonio', 'Ariosto', 'Armando', 'Arnaldo', 'Artemio', 'Augusto',
-        'Aurelio', 'Aureliano', 'Avelino', 'Ayrton', 'Baltasar', 'Baltazar', 'Belmiro', 'Beltrão',
-        'Benedito', 'Benilson', 'Beno', 'Benoni', 'Benvenuto', 'Berilo', 'Brinaldo', 'Brás',
-        'Ana', 'Beatriz', 'Carla', 'Daniela', 'Elisa', 'Fernanda', 'Gabriela', 'Heloisa',
-        'Iris', 'Joana', 'Katarina', 'Laura', 'Mariana', 'Natalia', 'Olivia', 'Patricia',
-        'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Yasmin', 'Zelia',
-        'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Amanda', 'Angelica', 'Aparecida',
-        'Augusta', 'Barbara', 'Bianca', 'Bruna', 'Camila', 'Carolina', 'Cecilia', 'Celia',
-        'Clara', 'Claudia', 'Cristina', 'Debora', 'Denise', 'Diana', 'Eduarda', 'Elena',
-        'Elisabete', 'Emilia', 'Erica', 'Esther', 'Fabiana', 'Fatima', 'Flavia', 'Flora',
-        'Francisca', 'Gisele', 'Gloria', 'Graciela', 'Helena', 'Ines', 'Isabel', 'Ivone',
-        'Jacqueline', 'Janaina', 'Josefa', 'Julia', 'Juliana', 'Karina', 'Lara', 'Larissa',
-        'Leticia', 'Lia', 'Lidia', 'Lilian', 'Lorena', 'Lucia', 'Luciana', 'Luisa',
-        'Madalena', 'Manuela', 'Marcela', 'Marcia', 'Margareth', 'Marta', 'Melissa', 'Michele',
-        'Miriam', 'Monica', 'Nadia', 'Neusa', 'Nina', 'Norma', 'Odete', 'Olga',
-        'Pamela', 'Paula', 'Priscila', 'Raquel', 'Regina', 'Renata', 'Rita', 'Roberta',
-        'Rosa', 'Rosana', 'Rosangela', 'Sandra', 'Sara', 'Silvia', 'Sofia', 'Sonia',
-        'Stella', 'Sueli', 'Suzana', 'Tania', 'Teresa', 'Valeria', 'Vera', 'Veronica',
-        'Vitoria', 'Viviane', 'Yara', 'Yolanda'
-    ];
+  return [
+    'Roberto', 'Carlos', 'Francisco', 'Antonio', 'Marcos', 'Alexandre', 'Felipe', 'Diego',
+    'Bruno', 'Ricardo', 'Rodrigo', 'Gustavo', 'Lucas', 'Daniel', 'Rafael', 'Fernando',
+    'Sergio', 'Paulo', 'Luis', 'Fabio', 'Claudio', 'Marcelo', 'Mateus', 'Andre',
+    'Edson', 'Leandro', 'Thiago', 'Mauricio', 'Gabriel', 'Henrique', 'Leonardo', 'Samuel',
+    'Gilson', 'Denis', 'Otavio', 'Vinicius', 'Joao', 'Jose', 'Manuel', 'Vicente',
+    'Inacio', 'Anselmo', 'Apolonio', 'Ariosto', 'Armando', 'Arnaldo', 'Artemio', 'Augusto',
+    'Aurelio', 'Aureliano', 'Avelino', 'Ayrton', 'Baltasar', 'Baltazar', 'Belmiro', 'Beltrão',
+    'Benedito', 'Benilson', 'Beno', 'Benoni', 'Benvenuto', 'Berilo', 'Brinaldo', 'Brás',
+    'Ana', 'Beatriz', 'Carla', 'Daniela', 'Elisa', 'Fernanda', 'Gabriela', 'Heloisa',
+    'Iris', 'Joana', 'Katarina', 'Laura', 'Mariana', 'Natalia', 'Olivia', 'Patricia',
+    'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Yasmin', 'Zelia',
+    'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Amanda', 'Angelica', 'Aparecida',
+    'Augusta', 'Barbara', 'Bianca', 'Bruna', 'Camila', 'Carolina', 'Cecilia', 'Celia',
+    'Clara', 'Claudia', 'Cristina', 'Debora', 'Denise', 'Diana', 'Eduarda', 'Elena',
+    'Elisabete', 'Emilia', 'Erica', 'Esther', 'Fabiana', 'Fatima', 'Flavia', 'Flora',
+    'Francisca', 'Gisele', 'Gloria', 'Graciela', 'Helena', 'Ines', 'Isabel', 'Ivone',
+    'Jacqueline', 'Janaina', 'Josefa', 'Julia', 'Juliana', 'Karina', 'Lara', 'Larissa',
+    'Leticia', 'Lia', 'Lidia', 'Lilian', 'Lorena', 'Lucia', 'Luciana', 'Luisa',
+    'Madalena', 'Manuela', 'Marcela', 'Marcia', 'Margareth', 'Marta', 'Melissa', 'Michele',
+    'Miriam', 'Monica', 'Nadia', 'Neusa', 'Nina', 'Norma', 'Odete', 'Olga',
+    'Pamela', 'Paula', 'Priscila', 'Raquel', 'Regina', 'Renata', 'Rita', 'Roberta',
+    'Rosa', 'Rosana', 'Rosangela', 'Sandra', 'Sara', 'Silvia', 'Sofia', 'Sonia',
+    'Stella', 'Sueli', 'Suzana', 'Tania', 'Teresa', 'Valeria', 'Vera', 'Veronica',
+    'Vitoria', 'Viviane', 'Yara', 'Yolanda'
+  ];
 }
 
 // ==================== CONFIGURAÇÃO DE EVENTOS ====================
+
 function setupEventListeners() {
-    const cpfInput = document.getElementById('cpf-input');
-    const btnSearch = document.getElementById('btn-search');
-    const cpfBackground = document.querySelector('.cpf-background');
+  const cpfInput = document.getElementById('cpf-input');
+  const btnSearch = document.getElementById('btn-search');
+  const cpfBackground = document.querySelector('.cpf-background');
+  
+  cpfInput.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    document.getElementById('error-cpf').textContent = '';
     
-    cpfInput.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
-        document.getElementById('error-cpf').textContent = '';
-        
-        // Desaparecer o fundo quando começa a digitar
-        if (e.target.value.length > 0) {
-            cpfBackground.classList.add('hidden');
-        } else {
-            cpfBackground.classList.remove('hidden');
-        }
-    });
-    
-    cpfInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && cpfInput.value.length === 4) {
-            searchCpf();
-        }
-    });
-    
-    btnSearch.addEventListener('click', searchCpf);
-    document.getElementById('btn-confirm-name').addEventListener('click', confirmName);
-    document.getElementById('btn-back-to-cpf').addEventListener('click', backToCpf);
-    document.getElementById('btn-retry').addEventListener('click', backToCpf);
-    
-    // Prevenir comportamento padrão do link de privacidade
-    document.querySelector('.privacy-link').addEventListener('click', (e) => {
-        e.preventDefault();
-    });
+    if (e.target.value.length > 0) {
+      cpfBackground.classList.add('hidden');
+    } else {
+      cpfBackground.classList.remove('hidden');
+    }
+  });
+  
+  cpfInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && cpfInput.value.length === 4) {
+      searchCpf();
+    }
+  });
+  
+  btnSearch.addEventListener('click', searchCpf);
+  document.getElementById('btn-confirm-name').addEventListener('click', confirmName);
+  document.getElementById('btn-back-to-cpf').addEventListener('click', backToCpf);
+  document.getElementById('btn-logout-chat').addEventListener('click', backToCpf);
+  document.getElementById('btn-retry').addEventListener('click', backToCpf);
+  
+  document.querySelector('.privacy-link').addEventListener('click', (e) => {
+    e.preventDefault();
+  });
 }
 
 // ==================== FUNÇÕES DE TELA ====================
+
 function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
 }
 
 // ==================== BUSCA DE CPF ====================
+
 async function searchCpf() {
-    const cpfInput = document.getElementById('cpf-input');
-    const cpf = cpfInput.value.trim();
-    const errorElement = document.getElementById('error-cpf');
-    const btnSearch = document.getElementById('btn-search');
-    const loadingElement = document.getElementById('loading-cpf');
+  const cpfInput = document.getElementById('cpf-input');
+  const cpf = cpfInput.value.trim();
+  const errorElement = document.getElementById('error-cpf');
+  const btnSearch = document.getElementById('btn-search');
+  const loadingElement = document.getElementById('loading-cpf');
+  
+  errorElement.textContent = '';
+  
+  if (cpf.length !== 4) {
+    errorElement.textContent = 'Digite exatamente 4 dígitos';
+    return;
+  }
+  
+  btnSearch.disabled = true;
+  loadingElement.style.display = 'flex';
+  
+  try {
+    const data = await fetchGistData();
+    const matches = data.filter(record => record.cpf_primeiros_4 === cpf);
     
-    errorElement.textContent = '';
+    state.currentCpf = cpf;
+    state.selectedName = null;
     
-    if (cpf.length !== 4) {
-        errorElement.textContent = 'Digite exatamente 4 dígitos';
-        return;
+    if (matches.length === 0) {
+      state.cpfExists = false;
+      state.matchedUsers = [];
+      showRandomNamesScreen();
+    } else {
+      state.cpfExists = true;
+      state.matchedUsers = matches;
+      showNameSelectionScreen();
     }
-    
-    btnSearch.disabled = true;
-    loadingElement.style.display = 'flex';
-    
-    try {
-        const data = await fetchGistData();
-        const matches = data.filter(record => record.cpf_primeiros_4 === cpf);
-        
-        state.currentCpf = cpf;
-        state.selectedName = null;
-        
-        if (matches.length === 0) {
-            // CPF não existe - mostrar nomes aleatórios
-            state.cpfExists = false;
-            state.matchedUsers = [];
-            showRandomNamesScreen();
-        } else {
-            // CPF existe - mostrar nomes reais + aleatórios
-            state.cpfExists = true;
-            state.matchedUsers = matches;
-            showNameSelectionScreen();
-        }
-    } catch (error) {
-        console.error('Erro ao buscar CPF:', error);
-        errorElement.textContent = 'Erro ao conectar ao servidor. Tente novamente.';
-        btnSearch.disabled = false;
-        loadingElement.style.display = 'none';
-    }
+  } catch (error) {
+    console.error('Erro ao buscar CPF:', error);
+    errorElement.textContent = 'Erro ao conectar ao servidor. Tente novamente.';
+    btnSearch.disabled = false;
+    loadingElement.style.display = 'none';
+  }
 }
 
 // ==================== BUSCA DE DADOS DO GIST ====================
+
 async function fetchGistData() {
-    try {
-        const response = await fetch(GIST_URL);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar dados do Gist:', error);
-        throw error;
+  try {
+    const response = await fetch(GIST_URL);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao buscar dados do Gist:', error);
+    throw error;
+  }
 }
 
 // ==================== TELA DE SELEÇÃO DE NOME (CPF VÁLIDO) ====================
+
 function showNameSelectionScreen() {
-    const realNames = state.matchedUsers.map(u => u.primeiro_nome);
-    const alternatives = buildAlternativesList(realNames);
+  const realNames = state.matchedUsers.map(u => u.primeiro_nome);
+  const alternatives = buildAlternativesList(realNames);
+  
+  shuffleArray(alternatives);
+  
+  const container = document.getElementById('names-container');
+  container.innerHTML = '';
+  
+  alternatives.forEach((name) => {
+    const button = document.createElement('button');
+    button.className = 'name-option';
+    button.textContent = name;
+    button.setAttribute('data-name', name);
+    button.setAttribute('aria-label', `Opção: ${name}`);
     
-    shuffleArray(alternatives);
+    button.addEventListener('click', () => selectName(name, button));
     
-    const container = document.getElementById('names-container');
-    container.innerHTML = '';
-    
-    alternatives.forEach((name) => {
-        const button = document.createElement('button');
-        button.className = 'name-option';
-        button.textContent = name;
-        button.setAttribute('data-name', name);
-        button.setAttribute('aria-label', `Opção: ${name}`);
-        
-        button.addEventListener('click', () => selectName(name, button));
-        
-        container.appendChild(button);
-    });
-    
-    document.getElementById('error-name').textContent = '';
-    document.getElementById('loading-cpf').style.display = 'none';
-    document.getElementById('btn-search').disabled = false;
-    showScreen('screen-name');
+    container.appendChild(button);
+  });
+  
+  document.getElementById('error-name').textContent = '';
+  document.getElementById('loading-cpf').style.display = 'none';
+  document.getElementById('btn-search').disabled = false;
+  showScreen('screen-name');
 }
 
 // ==================== TELA DE NOMES ALEATÓRIOS (CPF INVÁLIDO) ====================
+
 function showRandomNamesScreen() {
-    // Gera apenas nomes aleatórios quando CPF não existe
-    const randomNames = [];
-    while (randomNames.length < 6) { // Mostrar 6 nomes aleatórios
-        const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
-        
-        if (!randomNames.includes(randomName)) {
-            randomNames.push(randomName);
-        }
+  const randomNames = [];
+  while (randomNames.length < 6) {
+    const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
+    
+    if (!randomNames.includes(randomName)) {
+      randomNames.push(randomName);
     }
+  }
+  
+  shuffleArray(randomNames);
+  
+  const container = document.getElementById('names-container');
+  container.innerHTML = '';
+  
+  randomNames.forEach((name) => {
+    const button = document.createElement('button');
+    button.className = 'name-option';
+    button.textContent = name;
+    button.setAttribute('data-name', name);
+    button.setAttribute('aria-label', `Opção: ${name}`);
     
-    shuffleArray(randomNames);
+    button.addEventListener('click', () => selectName(name, button));
     
-    const container = document.getElementById('names-container');
-    container.innerHTML = '';
-    
-    randomNames.forEach((name) => {
-        const button = document.createElement('button');
-        button.className = 'name-option';
-        button.textContent = name;
-        button.setAttribute('data-name', name);
-        button.setAttribute('aria-label', `Opção: ${name}`);
-        
-        button.addEventListener('click', () => selectName(name, button));
-        
-        container.appendChild(button);
-    });
-    
-    document.getElementById('error-name').textContent = '';
-    document.getElementById('loading-cpf').style.display = 'none';
-    document.getElementById('btn-search').disabled = false;
-    showScreen('screen-name');
+    container.appendChild(button);
+  });
+  
+  document.getElementById('error-name').textContent = '';
+  document.getElementById('loading-cpf').style.display = 'none';
+  document.getElementById('btn-search').disabled = false;
+  showScreen('screen-name');
 }
 
 // ==================== CONSTRUIR LISTA DE ALTERNATIVAS ====================
+
 function buildAlternativesList(realNames) {
-    const alternatives = [...realNames];
+  const alternatives = [...realNames];
+  
+  const randomToAdd = [];
+  while (randomToAdd.length < RANDOM_NAMES_COUNT) {
+    const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
     
-    const randomToAdd = [];
-    while (randomToAdd.length < RANDOM_NAMES_COUNT) {
-        const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
-        
-        if (!randomToAdd.includes(randomName) && !alternatives.includes(randomName)) {
-            randomToAdd.push(randomName);
-        }
+    if (!randomToAdd.includes(randomName) && !alternatives.includes(randomName)) {
+      randomToAdd.push(randomName);
     }
-    
-    alternatives.push(...randomToAdd);
-    
-    return [...new Set(alternatives)];
+  }
+  
+  alternatives.push(...randomToAdd);
+  
+  return [...new Set(alternatives)];
 }
 
 // ==================== SELEÇÃO DE NOME ====================
+
 function selectName(name, buttonElement) {
-    document.querySelectorAll('.name-option.selected').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    
-    buttonElement.classList.add('selected');
-    state.selectedName = name;
+  document.querySelectorAll('.name-option.selected').forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  
+  buttonElement.classList.add('selected');
+  state.selectedName = name;
 }
 
 // ==================== CONFIRMAÇÃO DE NOME ====================
+
 function confirmName() {
-    if (!state.selectedName) {
-        document.getElementById('error-name').textContent = 'Selecione um nome para continuar';
-        return;
-    }
+  if (!state.selectedName) {
+    document.getElementById('error-name').textContent = 'Selecione um nome para continuar';
+    return;
+  }
+  
+  if (state.cpfExists) {
+    const realNames = state.matchedUsers.map(u => u.primeiro_nome);
     
-    // Se CPF existe, verificar se nome está na lista
-    if (state.cpfExists) {
-        const realNames = state.matchedUsers.map(u => u.primeiro_nome);
-        
-        if (realNames.includes(state.selectedName)) {
-            // Nome correto - redirecionar automaticamente
-            const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
-            redirectToLink(user.link_redirecionamento);
-            return;
-        }
+    if (realNames.includes(state.selectedName)) {
+      const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
+      openBotpressEmbed(user.link_redirecionamento);
+      return;
     }
-    
-    // Nome incorreto (ou CPF inexistente, então qualquer nome é errado)
-    showErrorScreen();
+  }
+  
+  showErrorScreen();
 }
 
-// ==================== REDIRECIONAMENTO AUTOMÁTICO ====================
-function redirectToLink(redirectUrl) {
-    showScreen('screen-success');
-    const loadingRedirect = document.getElementById('loading-redirect');
-    loadingRedirect.style.display = 'flex';
-    
-    setTimeout(() => {
-        window.location.href = redirectUrl;
-    }, 1500);
+// ==================== ABRIR EMBED DO BOTPRESS ====================
+
+function openBotpressEmbed(groupLink) {
+  // Verificar se o link está mapeado nos embeds
+  if (!BOTPRESS_EMBEDS[groupLink]) {
+    console.error('Link não mapeado nos embeds:', groupLink);
+    showErrorScreen();
+    return;
+  }
+  
+  const embedConfig = BOTPRESS_EMBEDS[groupLink];
+  state.currentGroupKey = groupLink;
+  
+  // Limpar scripts Botpress anteriores
+  document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
+  
+  // Limpar container anterior
+  const chatContainer = document.getElementById('chat-container');
+  chatContainer.innerHTML = '<div id="bp-widget-container"></div>';
+  
+  // Injetar scripts do Botpress
+  embedConfig.scripts.forEach((src, index) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.defer = true;
+    script.setAttribute('data-embed', 'botpress');
+    document.body.appendChild(script);
+  });
+  
+  // Mostrar a tela de chat
+  showScreen('screen-chat');
 }
 
 // ==================== TELA DE ERRO ====================
+
 function showErrorScreen() {
-    const warningMessage = document.getElementById('warning-message');
-    warningMessage.textContent = 'Atenção! Verifique seus dados. Múltiplas tentativas erradas podem resultar em bloqueio temporário.';
-    
-    showScreen('screen-error');
+  const warningMessage = document.getElementById('warning-message');
+  warningMessage.textContent = 'Atenção! Verifique seus dados. Múltiplas tentativas erradas podem resultar em bloqueio temporário.';
+  
+  showScreen('screen-error');
 }
 
 // ==================== BLOQUEIO DE ACESSO (BÁSICO) ====================
+
 function checkIfLocked() {
-    try {
-        const lockEndTime = localStorage.getItem('auth_lock_end_time');
-        if (lockEndTime) {
-            const endTime = parseInt(lockEndTime);
-            if (Date.now() < endTime) {
-                state.isLocked = true;
-                state.lockEndTime = endTime;
-            }
-        }
-    } catch (e) {
-        console.warn('localStorage não disponível');
+  try {
+    const lockEndTime = localStorage.getItem('auth_lock_end_time');
+    if (lockEndTime) {
+      const endTime = parseInt(lockEndTime);
+      if (Date.now() < endTime) {
+        state.isLocked = true;
+        state.lockEndTime = endTime;
+      }
     }
+  } catch (e) {
+    console.warn('localStorage não disponível');
+  }
 }
 
 // ==================== NAVEGAÇÃO ====================
+
 function backToCpf() {
-    state.selectedName = null;
-    state.matchedUsers = [];
-    state.currentCpf = null;
-    state.cpfExists = false;
-    
-    const cpfInput = document.getElementById('cpf-input');
-    const cpfBackground = document.querySelector('.cpf-background');
-    
-    cpfInput.value = '';
-    cpfBackground.classList.remove('hidden');
-    document.getElementById('error-cpf').textContent = '';
-    document.getElementById('btn-search').disabled = false;
-    document.getElementById('loading-cpf').style.display = 'none';
-    
-    showScreen('screen-cpf');
+  state.selectedName = null;
+  state.matchedUsers = [];
+  state.currentCpf = null;
+  state.cpfExists = false;
+  state.currentGroupKey = null;
+  
+  // Remover scripts do Botpress ao voltar
+  document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
+  
+  const cpfInput = document.getElementById('cpf-input');
+  const cpfBackground = document.querySelector('.cpf-background');
+  
+  cpfInput.value = '';
+  cpfBackground.classList.remove('hidden');
+  document.getElementById('error-cpf').textContent = '';
+  document.getElementById('btn-search').disabled = false;
+  document.getElementById('loading-cpf').style.display = 'none';
+  
+  showScreen('screen-cpf');
 }
 
 // ==================== UTILITÁRIOS ====================
+
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
