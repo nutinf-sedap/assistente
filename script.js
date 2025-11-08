@@ -1,15 +1,12 @@
 // ==================== CONFIGURAÇÃO ====================
 const GIST_URL = 'https://gist.githubusercontent.com/nutinf-sedap/131c5b754b130eebe369c84350114016/raw/'; // Substitua pelos seus valores
 const RANDOM_NAMES_COUNT = 4;
-const MAX_ATTEMPTS = 5;
-const LOCK_TIME = 10 * 60 * 1000; // 10 minutos em ms
 
 // ==================== ESTADO GLOBAL ====================
 let state = {
     currentCpf: null,
     matchedUsers: [],
     selectedName: null,
-    attemptCount: 0,
     isLocked: false,
     lockEndTime: null,
     cpfExists: false // Flag para saber se o CPF existe na base
@@ -92,6 +89,11 @@ function setupEventListeners() {
     document.getElementById('btn-confirm-name').addEventListener('click', confirmName);
     document.getElementById('btn-back-to-cpf').addEventListener('click', backToCpf);
     document.getElementById('btn-retry').addEventListener('click', backToCpf);
+    
+    // Prevenir comportamento padrão do link de privacidade
+    document.querySelector('.privacy-link').addEventListener('click', (e) => {
+        e.preventDefault();
+    });
 }
 
 // ==================== FUNÇÕES DE TELA ====================
@@ -115,12 +117,6 @@ async function searchCpf() {
         return;
     }
     
-    if (state.isLocked) {
-        const remainingTime = Math.ceil((state.lockEndTime - Date.now()) / 1000);
-        errorElement.textContent = `Bloqueado. Tente novamente em ${remainingTime}s`;
-        return;
-    }
-    
     btnSearch.disabled = true;
     loadingElement.style.display = 'flex';
     
@@ -130,7 +126,6 @@ async function searchCpf() {
         
         state.currentCpf = cpf;
         state.selectedName = null;
-        state.attemptCount = 0; // Resetar contador para novo CPF
         
         if (matches.length === 0) {
             // CPF não existe - mostrar nomes aleatórios
@@ -279,14 +274,7 @@ function confirmName() {
     }
     
     // Nome incorreto (ou CPF inexistente, então qualquer nome é errado)
-    state.attemptCount++;
-    
-    if (state.attemptCount >= MAX_ATTEMPTS) {
-        lockAccess();
-        showLockScreen();
-    } else {
-        showErrorScreen();
-    }
+    showErrorScreen();
 }
 
 // ==================== REDIRECIONAMENTO AUTOMÁTICO ====================
@@ -302,63 +290,13 @@ function redirectToLink(redirectUrl) {
 
 // ==================== TELA DE ERRO ====================
 function showErrorScreen() {
-    const remainingAttempts = MAX_ATTEMPTS - state.attemptCount;
-    const attemptInfo = document.getElementById('attempt-info');
-    
-    if (remainingAttempts > 0) {
-        attemptInfo.textContent = `Tentativas restantes: ${remainingAttempts}`;
-    }
+    const warningMessage = document.getElementById('warning-message');
+    warningMessage.textContent = 'Atenção! Verifique seus dados. Múltiplas tentativas erradas podem resultar em bloqueio temporário.';
     
     showScreen('screen-error');
 }
 
-// ==================== TELA DE BLOQUEIO ====================
-function showLockScreen() {
-    const attemptInfo = document.getElementById('attempt-info');
-    attemptInfo.textContent = 'Você excedeu o número máximo de tentativas. Tente novamente em 10 minutos.';
-    
-    showScreen('screen-error');
-    
-    const btnRetry = document.getElementById('btn-retry');
-    btnRetry.disabled = true;
-    
-    let remainingSeconds = 600;
-    const countdownInterval = setInterval(() => {
-        remainingSeconds--;
-        attemptInfo.textContent = `Bloqueado. Desbloqueio em ${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, '0')}`;
-        
-        if (remainingSeconds <= 0) {
-            clearInterval(countdownInterval);
-            btnRetry.disabled = false;
-            state.isLocked = false;
-            unlockAccess();
-        }
-    }, 1000);
-}
-
-// ==================== BLOQUEIO DE ACESSO ====================
-function lockAccess() {
-    state.isLocked = true;
-    state.lockEndTime = Date.now() + LOCK_TIME;
-    
-    try {
-        localStorage.setItem('auth_lock_end_time', state.lockEndTime.toString());
-    } catch (e) {
-        console.warn('localStorage não disponível');
-    }
-}
-
-function unlockAccess() {
-    state.isLocked = false;
-    state.lockEndTime = null;
-    
-    try {
-        localStorage.removeItem('auth_lock_end_time');
-    } catch (e) {
-        console.warn('localStorage não disponível');
-    }
-}
-
+// ==================== BLOQUEIO DE ACESSO (BÁSICO) ====================
 function checkIfLocked() {
     try {
         const lockEndTime = localStorage.getItem('auth_lock_end_time');
@@ -367,8 +305,6 @@ function checkIfLocked() {
             if (Date.now() < endTime) {
                 state.isLocked = true;
                 state.lockEndTime = endTime;
-            } else {
-                unlockAccess();
             }
         }
     } catch (e) {
@@ -382,7 +318,6 @@ function backToCpf() {
     state.matchedUsers = [];
     state.currentCpf = null;
     state.cpfExists = false;
-    state.attemptCount = 0; // Resetar tentativas ao voltar
     
     const cpfInput = document.getElementById('cpf-input');
     const cpfBackground = document.querySelector('.cpf-background');
