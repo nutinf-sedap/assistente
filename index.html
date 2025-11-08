@@ -12,22 +12,24 @@
         <div id="screen-cpf" class="screen active">
             <h1>Digite os 4 primeiros dígitos do seu CPF</h1>
             <div class="form-group">
-                <div class="cpf-input-wrapper">
-                    <div class="cpf-placeholder">
-                        <span>•</span>
-                        <span>•</span>
-                        <span>•</span>
-                        <span>•</span>
+                <div class="cpf-input-container">
+                    <div class="cpf-visual-wrapper">
+                        <div class="cpf-background">
+                            <span class="cpf-digit-bg">0</span>
+                            <span class="cpf-digit-bg">0</span>
+                            <span class="cpf-digit-bg">0</span>
+                            <span class="cpf-dot-bg">.</span>
+                            <span class="cpf-digit-bg">0</span>
+                        </div>
+                        <input 
+                            id="cpf-input" 
+                            type="text" 
+                            inputmode="numeric" 
+                            pattern="\d{4}" 
+                            maxlength="4"
+                            aria-label="CPF - primeiros 4 dígitos"
+                        >
                     </div>
-                    <input 
-                        id="cpf-input" 
-                        type="text" 
-                        inputmode="numeric" 
-                        pattern="\d{4}" 
-                        maxlength="4" 
-                        placeholder="0000"
-                        aria-label="CPF - primeiros 4 dígitos"
-                    >
                 </div>
                 <div class="error-message" id="error-cpf"></div>
             </div>
@@ -45,7 +47,7 @@
             <div class="loading" id="loading-name" style="display:none;"></div>
         </div>
 
-        <!-- Tela 3: Sucesso -->
+        <!-- Tela 3: Sucesso (apenas loading, sem botão) -->
         <div id="screen-success" class="screen">
             <div class="success-content">
                 <div class="success-icon">✓</div>
