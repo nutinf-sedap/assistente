@@ -129,7 +129,8 @@ async function searchCpf() {
         const matches = data.filter(record => record.cpf_primeiros_4 === cpf);
         
         state.currentCpf = cpf;
-        state.attemptCount = 0;
+        state.selectedName = null;
+        state.attemptCount = 0; // Resetar contador para novo CPF
         
         if (matches.length === 0) {
             // CPF não existe - mostrar nomes aleatórios
@@ -190,6 +191,8 @@ function showNameSelectionScreen() {
     });
     
     document.getElementById('error-name').textContent = '';
+    document.getElementById('loading-cpf').style.display = 'none';
+    document.getElementById('btn-search').disabled = false;
     showScreen('screen-name');
 }
 
@@ -223,6 +226,8 @@ function showRandomNamesScreen() {
     });
     
     document.getElementById('error-name').textContent = '';
+    document.getElementById('loading-cpf').style.display = 'none';
+    document.getElementById('btn-search').disabled = false;
     showScreen('screen-name');
 }
 
@@ -377,6 +382,7 @@ function backToCpf() {
     state.matchedUsers = [];
     state.currentCpf = null;
     state.cpfExists = false;
+    state.attemptCount = 0; // Resetar tentativas ao voltar
     
     const cpfInput = document.getElementById('cpf-input');
     const cpfBackground = document.querySelector('.cpf-background');
