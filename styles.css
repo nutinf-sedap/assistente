@@ -1170,3 +1170,8 @@ input[type="text"]::-webkit-inner-spin-button {
         font-size: var(--font-size-xs);
     }
 }
+
+/* Empurra o rodapé mais para baixo somente na tela de CPF */
+#screen-cpf.active + .footer-section {
+    margin-top: 56px; /* ajuste aqui: 40px, 64px, etc. */
+}
