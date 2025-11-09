@@ -4,20 +4,17 @@ const BOTPRESS_EMBEDS = {
   'https://exemplo.com/grupo1': {
     grupo: 'grupo1',
     inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js',
-    container_id: 'bp-embedded-webchat'
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js'
   },
   'https://exemplo.com/grupo2': {
     grupo: 'grupo2',
     inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO2.js',
-    container_id: 'bp-embedded-webchat'
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO2.js'
   },
   'https://exemplo.com/grupo3': {
     grupo: 'grupo3',
     inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/TERCEIRO-ID-GRUPO3.js',
-    container_id: 'bp-embedded-webchat'
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/TERCEIRO-ID-GRUPO3.js'
   }
 };
 
@@ -43,59 +40,22 @@ let randomNamesList = [];
 document.addEventListener('DOMContentLoaded', () => {
   loadRandomNamesList();
   setupEventListeners();
-  // NUNCA carregar Botpress no início
-  preventBotpressFromLoading();
 });
-
-// Função para impedir que Botpress apareça automaticamente
-function preventBotpressFromLoading() {
-  // Bloquear qualquer script do Botpress que tente se carregar
-  window.addEventListener('beforeload', (e) => {
-    if (e.target && e.target.src && e.target.src.includes('botpress')) {
-      if (!state.validationComplete) {
-        e.preventDefault();
-      }
-    }
-  }, true);
-}
 
 // ==================== CARREGAMENTO DE NOMES ====================
 
 async function loadRandomNamesList() {
-  try {
-    randomNamesList = getDefaultRandomNamesList();
-  } catch (error) {
-    console.error('Erro ao carregar lista de nomes:', error);
-    randomNamesList = getDefaultRandomNamesList();
-  }
-}
-
-function getDefaultRandomNamesList() {
-  return [
+  randomNamesList = [
     'Roberto', 'Carlos', 'Francisco', 'Antonio', 'Marcos', 'Alexandre', 'Felipe', 'Diego',
     'Bruno', 'Ricardo', 'Rodrigo', 'Gustavo', 'Lucas', 'Daniel', 'Rafael', 'Fernando',
     'Sergio', 'Paulo', 'Luis', 'Fabio', 'Claudio', 'Marcelo', 'Mateus', 'Andre',
     'Edson', 'Leandro', 'Thiago', 'Mauricio', 'Gabriel', 'Henrique', 'Leonardo', 'Samuel',
     'Gilson', 'Denis', 'Otavio', 'Vinicius', 'Joao', 'Jose', 'Manuel', 'Vicente',
-    'Inacio', 'Anselmo', 'Apolonio', 'Ariosto', 'Armando', 'Arnaldo', 'Artemio', 'Augusto',
-    'Aurelio', 'Aureliano', 'Avelino', 'Ayrton', 'Baltasar', 'Baltazar', 'Belmiro', 'Beltrão',
-    'Benedito', 'Benilson', 'Beno', 'Benoni', 'Benvenuto', 'Berilo', 'Brinaldo', 'Brás',
     'Ana', 'Beatriz', 'Carla', 'Daniela', 'Elisa', 'Fernanda', 'Gabriela', 'Heloisa',
     'Iris', 'Joana', 'Katarina', 'Laura', 'Mariana', 'Natalia', 'Olivia', 'Patricia',
     'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Yasmin', 'Zelia',
     'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Amanda', 'Angelica', 'Aparecida',
-    'Augusta', 'Barbara', 'Bianca', 'Bruna', 'Camila', 'Carolina', 'Cecilia', 'Celia',
-    'Clara', 'Claudia', 'Cristina', 'Debora', 'Denise', 'Diana', 'Eduarda', 'Elena',
-    'Elisabete', 'Emilia', 'Erica', 'Esther', 'Fabiana', 'Fatima', 'Flavia', 'Flora',
-    'Francisca', 'Gisele', 'Gloria', 'Graciela', 'Helena', 'Ines', 'Isabel', 'Ivone',
-    'Jacqueline', 'Janaina', 'Josefa', 'Julia', 'Juliana', 'Karina', 'Lara', 'Larissa',
-    'Leticia', 'Lia', 'Lidia', 'Lilian', 'Lorena', 'Lucia', 'Luciana', 'Luisa',
-    'Madalena', 'Manuela', 'Marcela', 'Marcia', 'Margareth', 'Marta', 'Melissa', 'Michele',
-    'Miriam', 'Monica', 'Nadia', 'Neusa', 'Nina', 'Norma', 'Odete', 'Olga',
-    'Pamela', 'Paula', 'Priscila', 'Raquel', 'Regina', 'Renata', 'Rita', 'Roberta',
-    'Rosa', 'Rosana', 'Rosangela', 'Sandra', 'Sara', 'Silvia', 'Sofia', 'Sonia',
-    'Stella', 'Sueli', 'Suzana', 'Tania', 'Teresa', 'Valeria', 'Vera', 'Veronica',
-    'Vitoria', 'Viviane', 'Yara', 'Yolanda'
+    'Augusta', 'Barbara', 'Bianca', 'Bruna', 'Camila', 'Carolina', 'Cecilia', 'Celia'
   ];
 }
 
@@ -137,8 +97,18 @@ function setupEventListeners() {
 // ==================== FUNÇÕES DE TELA ====================
 
 function showScreen(screenId) {
+  // Esconder telas normais
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+  
+  // Esconder tela de chat
+  document.querySelectorAll('.screen-chat-wrapper').forEach(s => s.classList.remove('active'));
+  
+  // Mostrar a tela especificada
+  if (screenId === 'screen-chat') {
+    document.getElementById('screen-chat').classList.add('active');
+  } else {
+    document.getElementById(screenId).classList.add('active');
+  }
 }
 
 // ==================== BUSCA DE CPF ====================
@@ -189,11 +159,7 @@ async function searchCpf() {
 async function fetchGistData() {
   try {
     const response = await fetch(GIST_URL);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -207,7 +173,6 @@ async function fetchGistData() {
 function showNameSelectionScreen() {
   const realNames = state.matchedUsers.map(u => u.primeiro_nome);
   const alternatives = buildAlternativesList(realNames);
-  
   shuffleArray(alternatives);
   
   const container = document.getElementById('names-container');
@@ -217,11 +182,7 @@ function showNameSelectionScreen() {
     const button = document.createElement('button');
     button.className = 'name-option';
     button.textContent = name;
-    button.setAttribute('data-name', name);
-    button.setAttribute('aria-label', `Opção: ${name}`);
-    
     button.addEventListener('click', () => selectName(name, button));
-    
     container.appendChild(button);
   });
   
@@ -237,7 +198,6 @@ function showRandomNamesScreen() {
   const randomNames = [];
   while (randomNames.length < 6) {
     const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
-    
     if (!randomNames.includes(randomName)) {
       randomNames.push(randomName);
     }
@@ -252,11 +212,7 @@ function showRandomNamesScreen() {
     const button = document.createElement('button');
     button.className = 'name-option';
     button.textContent = name;
-    button.setAttribute('data-name', name);
-    button.setAttribute('aria-label', `Opção: ${name}`);
-    
     button.addEventListener('click', () => selectName(name, button));
-    
     container.appendChild(button);
   });
   
@@ -270,18 +226,16 @@ function showRandomNamesScreen() {
 
 function buildAlternativesList(realNames) {
   const alternatives = [...realNames];
-  
   const randomToAdd = [];
+  
   while (randomToAdd.length < RANDOM_NAMES_COUNT) {
     const randomName = randomNamesList[Math.floor(Math.random() * randomNamesList.length)];
-    
     if (!randomToAdd.includes(randomName) && !alternatives.includes(randomName)) {
       randomToAdd.push(randomName);
     }
   }
   
   alternatives.push(...randomToAdd);
-  
   return [...new Set(alternatives)];
 }
 
@@ -291,7 +245,6 @@ function selectName(name, buttonElement) {
   document.querySelectorAll('.name-option.selected').forEach(btn => {
     btn.classList.remove('selected');
   });
-  
   buttonElement.classList.add('selected');
   state.selectedName = name;
 }
@@ -306,10 +259,8 @@ function confirmName() {
   
   if (state.cpfExists) {
     const realNames = state.matchedUsers.map(u => u.primeiro_nome);
-    
     if (realNames.includes(state.selectedName)) {
       const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
-      // VALIDAÇÃO COMPLETA - AUTORIZAR BOTPRESS
       state.validationComplete = true;
       loadBotpressEmbed(user.link_redirecionamento);
       return;
@@ -332,7 +283,7 @@ function loadBotpressEmbed(groupLink) {
   state.currentGroupKey = groupLink;
   
   // Limpar container
-  const container = document.getElementById(embedConfig.container_id);
+  const container = document.getElementById('bp-embedded-webchat');
   if (container) {
     container.innerHTML = '';
   }
@@ -340,13 +291,13 @@ function loadBotpressEmbed(groupLink) {
   // Remover scripts antigos
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
   
-  // Mostrar tela de chat PRIMEIRO
+  // Mostrar tela de chat
   showScreen('screen-chat');
   
-  // Aguardar visibilidade antes de injetar
+  // Injetar scripts após tela estar visível
   setTimeout(() => {
     injectBotpressScripts(embedConfig);
-  }, 200);
+  }, 300);
 }
 
 function injectBotpressScripts(embedConfig) {
@@ -357,7 +308,7 @@ function injectBotpressScripts(embedConfig) {
   injectScript.async = true;
   
   injectScript.onload = () => {
-    // Após inject carregar, injetar config
+    // Após inject, injetar config
     const configScript = document.createElement('script');
     configScript.src = embedConfig.config_script;
     configScript.defer = true;
@@ -365,18 +316,18 @@ function injectBotpressScripts(embedConfig) {
     
     configScript.onload = () => {
       state.botpressLoaded = true;
-      console.log('Botpress carregado com sucesso');
+      console.log('✓ Botpress carregado com sucesso');
     };
     
     configScript.onerror = () => {
-      console.error('Erro ao carregar config do Botpress');
+      console.error('✗ Erro ao carregar config do Botpress');
     };
     
     document.body.appendChild(configScript);
   };
   
   injectScript.onerror = () => {
-    console.error('Erro ao carregar inject do Botpress');
+    console.error('✗ Erro ao carregar inject do Botpress');
   };
   
   document.body.appendChild(injectScript);
@@ -387,7 +338,6 @@ function injectBotpressScripts(embedConfig) {
 function showErrorScreen() {
   const warningMessage = document.getElementById('warning-message');
   warningMessage.textContent = 'Atenção! Verifique seus dados. Múltiplas tentativas erradas podem resultar em bloqueio temporário.';
-  
   showScreen('screen-error');
 }
 
@@ -401,7 +351,7 @@ function backToCpf() {
   state.currentGroupKey = null;
   state.validationComplete = false;
   
-  // Remover scripts do Botpress completamente
+  // Remover scripts do Botpress
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
   
   // Limpar container
