@@ -1,6 +1,5 @@
 // ==================== CONFIGURAÇÃO ====================
 
-// Mapeamento de links do Gist para grupos e seus embeds do Botpress
 const BOTPRESS_EMBEDS = {
   'https://exemplo.com/grupo1': {
     grupo: 'grupo1',
@@ -33,7 +32,8 @@ let state = {
   selectedName: null,
   cpfExists: false,
   currentGroupKey: null,
-  botpressLoaded: false
+  botpressLoaded: false,
+  validationComplete: false
 };
 
 let randomNamesList = [];
@@ -43,8 +43,21 @@ let randomNamesList = [];
 document.addEventListener('DOMContentLoaded', () => {
   loadRandomNamesList();
   setupEventListeners();
-  // NÃO carregar Botpress aqui!
+  // NUNCA carregar Botpress no início
+  preventBotpressFromLoading();
 });
+
+// Função para impedir que Botpress apareça automaticamente
+function preventBotpressFromLoading() {
+  // Bloquear qualquer script do Botpress que tente se carregar
+  window.addEventListener('beforeload', (e) => {
+    if (e.target && e.target.src && e.target.src.includes('botpress')) {
+      if (!state.validationComplete) {
+        e.preventDefault();
+      }
+    }
+  }, true);
+}
 
 // ==================== CARREGAMENTO DE NOMES ====================
 
@@ -189,7 +202,7 @@ async function fetchGistData() {
   }
 }
 
-// ==================== TELA DE SELEÇÃO DE NOME (CPF VÁLIDO) ====================
+// ==================== TELA DE SELEÇÃO DE NOME ====================
 
 function showNameSelectionScreen() {
   const realNames = state.matchedUsers.map(u => u.primeiro_nome);
@@ -218,7 +231,7 @@ function showNameSelectionScreen() {
   showScreen('screen-name');
 }
 
-// ==================== TELA DE NOMES ALEATÓRIOS (CPF INVÁLIDO) ====================
+// ==================== TELA DE NOMES ALEATÓRIOS ====================
 
 function showRandomNamesScreen() {
   const randomNames = [];
@@ -296,7 +309,8 @@ function confirmName() {
     
     if (realNames.includes(state.selectedName)) {
       const user = state.matchedUsers.find(u => u.primeiro_nome === state.selectedName);
-      // APÓS VALIDAÇÃO CORRETA, CARREGAR O BOTPRESS
+      // VALIDAÇÃO COMPLETA - AUTORIZAR BOTPRESS
+      state.validationComplete = true;
       loadBotpressEmbed(user.link_redirecionamento);
       return;
     }
@@ -305,7 +319,7 @@ function confirmName() {
   showErrorScreen();
 }
 
-// ==================== CARREGAR BOTPRESS APENAS APÓS VALIDAÇÃO ====================
+// ==================== CARREGAR BOTPRESS APÓS VALIDAÇÃO ====================
 
 function loadBotpressEmbed(groupLink) {
   if (!BOTPRESS_EMBEDS[groupLink]) {
@@ -326,13 +340,13 @@ function loadBotpressEmbed(groupLink) {
   // Remover scripts antigos
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
   
-  // Mostrar tela de chat
+  // Mostrar tela de chat PRIMEIRO
   showScreen('screen-chat');
   
-  // Injetar scripts APÓS a tela estar visível
+  // Aguardar visibilidade antes de injetar
   setTimeout(() => {
     injectBotpressScripts(embedConfig);
-  }, 100);
+  }, 200);
 }
 
 function injectBotpressScripts(embedConfig) {
@@ -351,7 +365,7 @@ function injectBotpressScripts(embedConfig) {
     
     configScript.onload = () => {
       state.botpressLoaded = true;
-      console.log('Botpress carregado com sucesso no grupo:', embedConfig.grupo);
+      console.log('Botpress carregado com sucesso');
     };
     
     configScript.onerror = () => {
@@ -385,6 +399,7 @@ function backToCpf() {
   state.currentCpf = null;
   state.cpfExists = false;
   state.currentGroupKey = null;
+  state.validationComplete = false;
   
   // Remover scripts do Botpress completamente
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
@@ -395,7 +410,6 @@ function backToCpf() {
     container.innerHTML = '';
   }
   
-  // Reset do estado
   state.botpressLoaded = false;
   
   const cpfInput = document.getElementById('cpf-input');
