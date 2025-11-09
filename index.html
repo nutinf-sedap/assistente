@@ -47,13 +47,13 @@
             <div class="loading" id="loading-name" style="display:none;"></div>
         </div>
 
-        <!-- Tela 3: Chat (embed do Botpress) - OCULTO POR PADRÃO -->
-        <div id="screen-chat" class="screen screen-chat-full">
+        <!-- Tela 3: Chat (embed do Botpress) - SÓ APARECE APÓS VALIDAÇÃO -->
+        <div id="screen-chat" class="screen">
             <div class="chat-header">
                 <h1>Assistente</h1>
                 <button id="btn-logout-chat" class="btn btn-secondary btn-small" aria-label="Sair">SAIR</button>
             </div>
-            <div id="bp-embedded-webchat"></div>
+            <div id="bp-embedded-webchat" class="bp-container"></div>
         </div>
 
         <!-- Tela 4: Erro -->
@@ -66,14 +66,14 @@
             </div>
             <button id="btn-retry" class="btn btn-primary" aria-label="Tentar novamente">TENTAR NOVAMENTE</button>
         </div>
+    </div>
 
-        <!-- Footer com Privacy - SÓ NA TELA DE CPF -->
-        <div class="footer-section" id="footer-section">
-            <a href="#" class="privacy-link">
-                Meus dados estão seguros?
-                <span class="tooltip">Sim, você está digitando somente 4 dígitos do CPF e o seu primeiro nome. Em comparação, o PIX pode expor bem mais dígitos do CPF e o seu nome completo.</span>
-            </a>
-        </div>
+    <!-- Footer FORA do container, aparece sempre -->
+    <div class="footer-section">
+        <a href="#" class="privacy-link">
+            Meus dados estão seguros?
+            <span class="tooltip">Sim, você está digitando somente 4 dígitos do CPF e somente o seu primeiro nome. Em comparação, o Pix expõe bem mais dígitos e seu nome completo.</span>
+        </a>
     </div>
 
     <script src="script.js"></script>
