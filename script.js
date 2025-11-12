@@ -317,6 +317,7 @@ function injectBotpressScripts(embedConfig) {
     configScript.onload = () => {
       state.botpressLoaded = true;
       console.log('✓ Botpress carregado com sucesso');
+      hideLoadingText(); // ← ADICIONE ESTA LINHA
     };
     
     configScript.onerror = () => {
@@ -332,6 +333,18 @@ function injectBotpressScripts(embedConfig) {
   
   document.body.appendChild(injectScript);
 }
+
+// Esconder o texto de carregamento após Botpress estar pronto
+function hideLoadingText() {
+  const loadingText = document.getElementById('loading-text');
+  if (loadingText) {
+    setTimeout(() => {
+      loadingText.style.opacity = '0';
+      loadingText.style.visibility = 'hidden';
+    }, 6000); // Aguarda 2s após injetar
+  }
+}
+
 
 // ==================== TELA DE ERRO ====================
 
