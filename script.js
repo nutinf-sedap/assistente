@@ -50,16 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadRandomNamesList() {
   randomNamesList = [
-    'Roberto', 'Carlos', 'Francisco', 'Antonio', 'Marcos', 'Alexandre', 'Felipe', 'Diego',
-    'Bruno', 'Ricardo', 'Rodrigo', 'Gustavo', 'Lucas', 'Daniel', 'Rafael', 'Fernando',
-    'Sergio', 'Paulo', 'Luis', 'Fabio', 'Claudio', 'Marcelo', 'Mateus', 'Andre',
-    'Edson', 'Leandro', 'Thiago', 'Mauricio', 'Gabriel', 'Henrique', 'Leonardo', 'Samuel',
-    'Gilson', 'Denis', 'Otavio', 'Vinicius', 'Joao', 'Jose', 'Manuel', 'Vicente',
-    'Ana', 'Beatriz', 'Carla', 'Daniela', 'Elisa', 'Fernanda', 'Gabriela', 'Heloisa',
-    'Iris', 'Joana', 'Katarina', 'Laura', 'Mariana', 'Natalia', 'Olivia', 'Patricia',
-    'Rafaela', 'Simone', 'Tatiana', 'Ursula', 'Vanessa', 'Wanda', 'Yasmin', 'Zelia',
-    'Abigail', 'Adriana', 'Agatha', 'Agostinha', 'Aida', 'Amanda', 'Angelica', 'Aparecida',
-    'Augusta', 'Barbara', 'Bianca', 'Bruna', 'Camila', 'Carolina', 'Cecilia', 'Celia'
+    'ROBERTO', 'CARLOS', 'FRANCISCO', 'ANTONIO', 'MARCOS', 'ALEXANDRE', 'FELIPE', 'DIEGO',
+    'BRUNO', 'RICARDO', 'RODRIGO', 'GUSTAVO', 'LUCAS', 'DANIEL', 'RAFAEL', 'FERNANDO',
+    'SERGIO', 'PAULO', 'LUIS', 'FABIO', 'CLAUDIO', 'MARCELO', 'MATEUS', 'ANDRE',
+    'EDSON', 'LEANDRO', 'THIAGO', 'MAURICIO', 'GABRIEL', 'HENRIQUE', 'LEONARDO', 'SAMUEL',
+    'GILSON', 'DENIS', 'OTAVIO', 'VINICIUS', 'JOAO', 'JOSE', 'MANUEL', 'VICENTE',
+    'ANA', 'BEATRIZ', 'CARLA', 'DANIELA', 'ELISA', 'FERNANDA', 'GABRIELA', 'HELOISA',
+    'IRIS', 'JOANA', 'KATARINA', 'LAURA', 'MARIANA', 'NATALIA', 'OLIVIA', 'PATRICIA',
+    'RAFAELA', 'SIMONE', 'TATIANA', 'URSULA', 'VANESSA', 'WANDA', 'YASMIN', 'ZELIA',
+    'ABIGAIL', 'ADRIANA', 'AGATHA', 'AGOSTINHA', 'AIDA', 'AMANDA', 'ANGELICA', 'APARECIDA',
+    'AUGUSTA', 'BARBARA', 'BIANCA', 'BRUNA', 'CAMILA', 'CAROLINA', 'CECILIA', 'CELIA'
   ];
 }
 
