@@ -1,20 +1,20 @@
 // ==================== CONFIGURAÇÃO ====================
 
 const BOTPRESS_EMBEDS = {
-  'https://exemplo.com/grupo1': {
+  'grupo1': {
     grupo: 'grupo1',
     inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js'
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO1.js'
   },
-  'https://exemplo.com/grupo2': {
+  'grupo2': {
     grupo: 'grupo2',
     inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
     config_script: 'https://files.bpcontent.cloud/2025/11/08/01/OUTRO-ID-GRUPO2.js'
   },
-  'https://exemplo.com/grupo3': {
+  'grupo3': {
     grupo: 'grupo3',
     inject_script: 'https://cdn.botpress.cloud/webchat/v3.3/inject.js',
-    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/TERCEIRO-ID-GRUPO3.js'
+    config_script: 'https://files.bpcontent.cloud/2025/11/08/01/20251108015936-6WGCXIL1.js'
   }
 };
 
