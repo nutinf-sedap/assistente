@@ -986,6 +986,15 @@ input[type="text"]::-webkit-inner-spin-button {
   margin: var(--space-20) 0;
 }
 
+@media (max-width: 480px) {
+  .names-grid { gap: var(--space-8); }
+  .name-option {
+    padding: var(--space-8) var(--space-10);
+    font-size: var(--font-size-lg);
+    line-height: 1.05;
+  }
+}
+
 .name-option {
   padding: var(--space-10) var(--space-12);
   border: 2px solid var(--color-border);
