@@ -97,13 +97,9 @@ function setupEventListeners() {
 // ==================== FUNÇÕES DE TELA ====================
 
 function showScreen(screenId) {
-  // Esconder telas normais
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  
-  // Esconder tela de chat
   document.querySelectorAll('.screen-chat-wrapper').forEach(s => s.classList.remove('active'));
   
-  // Mostrar a tela especificada
   if (screenId === 'screen-chat') {
     document.getElementById('screen-chat').classList.add('active');
   } else {
@@ -270,6 +266,18 @@ function confirmName() {
   showErrorScreen();
 }
 
+// ==================== ESCONDER TEXTO DE CARREGAMENTO ====================
+
+function hideLoadingText() {
+  const loadingText = document.getElementById('loading-text');
+  if (loadingText) {
+    setTimeout(() => {
+      loadingText.style.opacity = '0';
+      loadingText.style.visibility = 'hidden';
+    }, 6000);
+  }
+}
+
 // ==================== CARREGAR BOTPRESS APÓS VALIDAÇÃO ====================
 
 function loadBotpressEmbed(groupLink) {
@@ -282,33 +290,27 @@ function loadBotpressEmbed(groupLink) {
   const embedConfig = BOTPRESS_EMBEDS[groupLink];
   state.currentGroupKey = groupLink;
   
-  // Limpar container
   const container = document.getElementById('bp-embedded-webchat');
   if (container) {
     container.innerHTML = '';
   }
   
-  // Remover scripts antigos
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
   
-  // Mostrar tela de chat
   showScreen('screen-chat');
   
-  // Injetar scripts após tela estar visível
   setTimeout(() => {
     injectBotpressScripts(embedConfig);
   }, 300);
 }
 
 function injectBotpressScripts(embedConfig) {
-  // Injetar script de inject
   const injectScript = document.createElement('script');
   injectScript.src = embedConfig.inject_script;
   injectScript.setAttribute('data-embed', 'botpress');
   injectScript.async = true;
   
   injectScript.onload = () => {
-    // Após inject, injetar config
     const configScript = document.createElement('script');
     configScript.src = embedConfig.config_script;
     configScript.defer = true;
@@ -317,7 +319,7 @@ function injectBotpressScripts(embedConfig) {
     configScript.onload = () => {
       state.botpressLoaded = true;
       console.log('✓ Botpress carregado com sucesso');
-      hideLoadingText(); // ← ADICIONE ESTA LINHA
+      hideLoadingText();
     };
     
     configScript.onerror = () => {
@@ -333,18 +335,6 @@ function injectBotpressScripts(embedConfig) {
   
   document.body.appendChild(injectScript);
 }
-
-// Esconder o texto de carregamento após Botpress estar pronto
-function hideLoadingText() {
-  const loadingText = document.getElementById('loading-text');
-  if (loadingText) {
-    setTimeout(() => {
-      loadingText.style.opacity = '0';
-      loadingText.style.visibility = 'hidden';
-    }, 6000); // Aguarda 2s após injetar
-  }
-}
-
 
 // ==================== TELA DE ERRO ====================
 
@@ -364,10 +354,8 @@ function backToCpf() {
   state.currentGroupKey = null;
   state.validationComplete = false;
   
-  // Remover scripts do Botpress
   document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
   
-  // Limpar container
   const container = document.getElementById('bp-embedded-webchat');
   if (container) {
     container.innerHTML = '';
@@ -388,8 +376,19 @@ function backToCpf() {
 }
 
 function logoutChat() {
-  backToCpf();
+  // limpa qualquer resíduo do Botpress (opcional, por segurança)
+  try {
+    document.querySelectorAll('script[data-embed="botpress"]').forEach(s => s.remove());
+    const container = document.getElementById('bp-embedded-webchat');
+    if (container) container.innerHTML = '';
+  } catch (e) {}
+
+  // força recarregar a página atual a partir do servidor
+  window.location.reload(true);
+  // alternativa: ir explicitamente para a raiz
+  // window.location.href = window.location.origin + window.location.pathname;
 }
+
 
 // ==================== UTILITÁRIOS ====================
 
