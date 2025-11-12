@@ -40,6 +40,10 @@ let randomNamesList = [];
 document.addEventListener('DOMContentLoaded', () => {
   loadRandomNamesList();
   setupEventListeners();
+
+  // foca automaticamente no campo CPF ao abrir
+  const cpfInput = document.getElementById('cpf-input');
+  if (cpfInput) cpfInput.focus();
 });
 
 // ==================== CARREGAMENTO DE NOMES ====================
@@ -104,6 +108,14 @@ function showScreen(screenId) {
     document.getElementById('screen-chat').classList.add('active');
   } else {
     document.getElementById(screenId).classList.add('active');
+  }
+  // Se a tela ativa for a de CPF, foca o input
+  if (screenId === 'screen-cpf') {
+    const cpfInput = document.getElementById('cpf-input');
+    if (cpfInput) {
+      // pequeno atraso para garantir que a tela ficou visível antes do foco
+      setTimeout(() => cpfInput.focus(), 50);
+    }
   }
 }
 
