@@ -987,7 +987,7 @@ input[type="text"]::-webkit-inner-spin-button {
 }
 
 .name-option {
-  padding: var(--space-16);
+  padding: var(--space-10) var(--space-12);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-base);
   background: var(--color-surface);
