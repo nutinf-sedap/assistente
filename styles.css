@@ -1164,7 +1164,7 @@ input[type="text"]::-webkit-outer-spin-button, input[type="text"]::-webkit-inner
 
 .chat-container { width: 100%; max-width: 90%; height: 90vh; background: var(--color-surface); border: 1px solid var(--color-card-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); display: flex; flex-direction: column; overflow: hidden; }
 
-.chat-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-20); border-bottom: 1px solid var(--color-border); gap: var(--space-12); flex-shrink: 0; background: var(--color-surface); }
+.chat-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-12) var(--space-12); border-bottom: 1px solid var(--color-border); gap: var(--space-8); flex-shrink: 0; background: var(--color-surface); }
 
 .header-content { display: flex; flex-direction: column; gap: var(--space-4); }
 .header-content h1 { margin: 0; font-size: var(--font-size-xl); }
