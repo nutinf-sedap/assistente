@@ -62,14 +62,21 @@
 
         <!-- Tela 4: Chat (SÓ APARECE APÓS VALIDAÇÃO) -->
         <div id="screen-chat" class="screen-chat-wrapper">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <h1>Assistente</h1>
-                    <button id="btn-logout-chat" class="btn btn-secondary btn-small" aria-label="Sair">SAIR</button>
-                </div>
-                <div id="bp-embedded-webchat" class="botpress-container"></div>
+        <div class="chat-container">
+            <div class="chat-header">
+            <div class="header-content">
+                <h1>Assistente</h1>
+                <span class="loading-text" id="loading-text">Aguarde, em carregamento...</span>
             </div>
+            <button id="btn-logout-chat" class="btn btn-secondary btn-small" aria-label="Sair">SAIR</button>
+            </div>
+            <div class="chat-warning">
+            Assistente (em treinamento). <strong>NÃO digite senhas ou dados sensíveis nesse chat.</strong>
+            </div>
+            <div id="bp-embedded-webchat" class="botpress-container"></div>
         </div>
+        </div>
+
 
         <!-- Footer -->
         <div class="footer-section">
